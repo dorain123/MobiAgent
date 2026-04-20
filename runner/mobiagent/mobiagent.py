@@ -12,21 +12,16 @@ import argparse
 import textwrap
 import cv2
 import sys
-import random
 from abc import ABC, abstractmethod
-import xml.etree.ElementTree as ET
 from PIL import Image, ImageDraw, ImageFont
 
 
-import numpy as np
 from utils.local_experience import PromptTemplateSearch 
 from pathlib import Path
 from hmdriver2.driver import Driver
 from hmdriver2.proto import KeyCode
 from utils.load_md_prompt import load_prompt
 from dotenv import load_dotenv
-from utils.local_experience import PromptTemplateSearch 
-from pathlib import Path
 from .user_preference_extractor import (
     PreferenceExtractor, 
     retrieve_user_preferences, 
@@ -50,6 +45,13 @@ logging.basicConfig(
 
 # 截图缩放比例
 factor = 0.5
+
+
+def _load_app_config(filename):
+    """从 config 目录加载应用包名配置文件"""
+    config_path = Path(__file__).parent / "config" / filename
+    with open(config_path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 # ============ 常数定义 ============
 MAX_STEPS = 15
@@ -112,30 +114,7 @@ class AndroidDevice(Device):
             self.d = u2.connect(adb_endpoint)
         else:
             self.d = u2.connect()
-        self.app_package_names = {
-            "携程": "ctrip.android.view",
-            "同城": "com.tongcheng.android",
-            "飞猪": "com.taobao.trip",
-            "去哪儿": "com.Qunar",
-            "华住会": "com.htinns",
-            "饿了么": "me.ele",
-            "支付宝": "com.eg.android.AlipayGphone",
-            "淘宝": "com.taobao.taobao",
-            "京东": "com.jingdong.app.mall",
-            "美团": "com.sankuai.meituan",
-            "滴滴出行": "com.sdu.didi.psnger",
-            "微信": "com.tencent.mm",
-            "微博": "com.sina.weibo",
-            "携程": "ctrip.android.view",
-            "华为商城": "com.vmall.client",
-            "华为视频": "com.huawei.himovie",
-            "华为音乐": "com.huawei.music",
-            "华为应用市场": "com.huawei.appmarket",
-            "拼多多": "com.xunmeng.pinduoduo",
-            "大众点评": "com.dianping.v1",
-            "小红书": "com.xingin.xhs",
-            "浏览器": "com.microsoft.emmx"
-        }
+        self.app_package_names = _load_app_config("apps_android.json")
 
     def start_app(self, app):
         package_name = self.app_package_names.get(app)
@@ -211,50 +190,7 @@ class HarmonyDevice(Device):
     def __init__(self):
         super().__init__()
         self.d = Driver()
-        self.app_package_names = {
-            "携程": "com.ctrip.harmonynext",
-            "飞猪": "com.fliggy.hmos",
-            "IntelliOS": "ohos.hongmeng.intellios",
-            "同城": "com.tongcheng.hmos",
-            "携程旅行": "com.ctrip.harmonynext",
-            "饿了么": "me.ele.eleme",
-            "知乎": "com.zhihu.hmos",
-            "哔哩哔哩": "yylx.danmaku.bili",
-            "微信": "com.tencent.wechat",
-            "小红书": "com.xingin.xhs_hos",
-            "QQ音乐": "com.tencent.hm.qqmusic",
-            "高德地图": "com.amap.hmapp",
-            "淘宝": "com.taobao.taobao4hmos",
-            "微博": "com.sina.weibo.stage",
-            "京东": "com.jd.hm.mall",
-            "飞猪旅行": "com.fliggy.hmos",
-            "天气": "com.huawei.hmsapp.totemweather",
-            "什么值得买": "com.smzdm.client.hmos",
-            "闲鱼": "com.taobao.idlefish4ohos",
-            "慧通差旅": "com.smartcom.itravelhm",
-            "PowerAgent": "com.example.osagent",
-            "航旅纵横": "com.umetrip.hm.app",
-            "滴滴出行": "com.sdu.didi.hmos.psnger",
-            "电子邮件": "com.huawei.hmos.email",
-            "图库": "com.huawei.hmos.photos",
-            "日历": "com.huawei.hmos.calendar",
-            "心声社区": "com.huawei.it.hmxinsheng",
-            "信息": "com.ohos.mms",
-            "文件管理": "com.huawei.hmos.files",
-            "运动健康": "com.huawei.hmos.health",
-            "智慧生活": "com.huawei.hmos.ailife",
-            "豆包": "com.larus.nova.hm",
-            "WeLink": "com.huawei.it.welink",
-            "设置": "com.huawei.hmos.settings",
-            "懂车帝": "com.ss.dcar.auto",
-            "美团外卖": "com.meituan.takeaway",
-            "大众点评": "com.sankuai.dianping",
-            "美团": "com.sankuai.hmeituan",
-            "浏览器": "com.huawei.hmos.browser",
-            "微博": "com.sina.weibo.stage",
-            "饿了么": "me.ele.eleme",
-            "拼多多": "com.xunmeng.pinduoduo.hos"
-        }
+        self.app_package_names = _load_app_config("apps_harmony.json")
 
     def start_app(self, app):
         package_name = self.app_package_names.get(app)
@@ -320,22 +256,22 @@ grounder_model = ""
 
 # 全局偏好提取器
 preference_extractor = None
-def init(service_ip, decider_port, grounder_port, planner_port, api_key="mobiagent-key", enable_user_profile=False, use_graphrag=False):
+def init(service_ip, decider_port, grounder_port, planner_port, enable_user_profile=False, use_graphrag=False):
     global decider_client, grounder_client, planner_client, general_client, general_model, apps, preference_extractor
     
     # 加载环境变量
     env_path = Path(__file__).parent / ".env"
     load_dotenv(env_path)
     decider_client = OpenAI(
-        api_key = api_key,
+        api_key = "0",
         base_url = f"http://{service_ip}:{decider_port}/v1",
     )
     grounder_client = OpenAI(
-        api_key = api_key,
+        api_key = "0",
         base_url = f"http://{service_ip}:{grounder_port}/v1",
     )
     planner_client = OpenAI(
-        api_key = api_key,
+        api_key = "0",
         base_url = f"http://{service_ip}:{planner_port}/v1",
     )
     
@@ -593,6 +529,14 @@ def validate_action_parameters(decider_response):
     elif action == "open_app":
         if not parameters.get("app_name"):
             raise ValueError("Open_app action missing required parameter: 'app_name'")
+
+    elif action == "press_home":
+        # press_home动作不需要额外参数
+        pass
+
+    elif action == "press_back":
+        # press_back动作不需要额外参数
+        pass
     
     elif action == "wait":
         # wait动作通常不需要额外参数
@@ -822,35 +766,325 @@ def build_decider_messages(task, history, screenshot, e2e):
     
     return messages
 
+
+def append_action_and_history(actions, history, decider_response, action_record):
+    """统一记录动作和历史，减少重复代码。"""
+    actions.append(action_record)
+    history.append(json.dumps(decider_response, ensure_ascii=False))
+
+
+def handle_click_input_action(decider_response, device, img, image_index, actions, history):
+    text = decider_response["parameters"]["text"]
+    bbox = decider_response["parameters"]["bbox"]
+    bbox = convert_qwen3_coordinates_to_absolute(bbox, img.width, img.height, is_bbox=True)
+    x1, y1, x2, y2 = bbox
+    position_x = (x1 + x2) // 2
+    position_y = (y1 + y2) // 2
+
+    device.click(position_x, position_y)
+    device.input(text)
+    append_action_and_history(actions, history, decider_response, {
+        "type": "click_input",
+        "position_x": position_x,
+        "position_y": position_y,
+        "bounds": [x1, y1, x2, y2],
+        "text": f"{text}",
+        "action_index": image_index
+    })
+
+
+def handle_input_action(decider_response, device, image_index, actions, history):
+    text = decider_response["parameters"]["text"]
+    device.input(text)
+    append_action_and_history(actions, history, decider_response, {
+        "type": "input",
+        "text": text,
+        "action_index": image_index
+    })
+
+
+def handle_open_app_action(decider_response, device, image_index, actions, history):
+    app_name = decider_response["parameters"]["app_name"]
+    try:
+        device.start_app(app_name)
+    except Exception as e:
+        logging.warning(f"Open app by app_name failed: {e}, trying as package name")
+        device.app_start(app_name)
+
+    append_action_and_history(actions, history, decider_response, {
+        "type": "open_app",
+        "app_name": app_name,
+        "action_index": image_index
+    })
+
+
+def handle_press_home_action(decider_response, device, device_type, image_index, actions, history):
+    if device_type == "Android":
+        device.keyevent("home")
+    else:
+        if hasattr(KeyCode, "HOME"):
+            device.keyevent(KeyCode.HOME)
+        else:
+            device.keyevent(1)
+
+    append_action_and_history(actions, history, decider_response, {
+        "type": "press_home",
+        "action_index": image_index
+    })
+
+
+def handle_press_back_action(decider_response, device, device_type, image_index, actions, history):
+    if device_type == "Android":
+        device.keyevent("back")
+    else:
+        if hasattr(KeyCode, "BACK"):
+            device.keyevent(KeyCode.BACK)
+        else:
+            device.keyevent(2)
+
+    append_action_and_history(actions, history, decider_response, {
+        "type": "press_back",
+        "action_index": image_index
+    })
+
+
+def handle_wait_action(decider_response, image_index, actions, history):
+    print("Waiting for a while...")
+    append_action_and_history(actions, history, decider_response, {
+        "type": "wait",
+        "action_index": image_index
+    })
+    time.sleep(DEVICE_WAIT_TIME * 2)
+
+
+def save_hierarchy(device, device_type, data_dir, image_index):
+    """根据设备类型保存 UI hierarchy。Android 保存为 XML，Harmony 保存为 JSON。"""
+    if device_type == "Android":
+        logging.info("Dumping UI hierarchy...")
+        try:
+            hierarchy = device.dump_hierarchy()
+        except Exception as e:
+            logging.error(f"Failed to dump UI hierarchy: {e}")
+            hierarchy = "<hierarchy_dump_failed/>"
+
+        hierarchy_path = os.path.join(data_dir, f"{image_index}.xml")
+        with open(hierarchy_path, "w", encoding="utf-8") as f:
+            f.write(hierarchy)
+        return
+
+    try:
+        hierarchy = device.dump_hierarchy()
+    except Exception as e:
+        logging.error(f"Failed to dump UI hierarchy: {e}")
+        hierarchy = {}
+
+    hierarchy_path = os.path.join(data_dir, f"{image_index}.json")
+    try:
+        if isinstance(hierarchy, str):
+            hierarchy_json = json.loads(hierarchy)
+        else:
+            hierarchy_json = hierarchy
+        with open(hierarchy_path, "w", encoding="utf-8") as f:
+            json.dump(hierarchy_json, f, ensure_ascii=False, indent=2)
+    except (json.JSONDecodeError, TypeError):
+        logging.warning(f"Failed to parse hierarchy as JSON, saving as plain text")
+        with open(hierarchy_path, "w", encoding="utf-8") as f:
+            f.write(str(hierarchy))
+
+
+def handle_click_action(decider_response, device, img, screenshot_resize, grounder_prompt_template_bbox,
+                        grounder_prompt_template_no_bbox, bbox_flag, use_qwen3, use_e2e,
+                        data_dir, device_paths, current_image, image_index, actions, history):
+    reasoning = decider_response["reasoning"]
+    target_element = decider_response["parameters"]["target_element"]
+
+    if use_e2e:
+        bbox = decider_response["parameters"]["bbox"]
+        if bbox is None:
+            logging.error("E2E mode: bbox not found in decider response")
+            raise ValueError("E2E mode requires bbox in decider response")
+
+        logging.info(f"E2E mode: Using bbox directly from decider: {bbox}")
+        if use_qwen3:
+            bbox = convert_qwen3_coordinates_to_absolute(bbox, img.width, img.height, is_bbox=True)
+        x1, y1, x2, y2 = bbox
+    else:
+        grounder_prompt = (grounder_prompt_template_bbox if bbox_flag else grounder_prompt_template_no_bbox).format(
+            reasoning=reasoning, description=target_element
+        )
+
+        try:
+            grounder_response = call_model_with_validation_retry(
+                grounder_client,
+                grounder_model,
+                [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{screenshot_resize}"}},
+                            {"type": "text", "text": grounder_prompt},
+                        ]
+                    }
+                ],
+                validator_func=validate_grounder_response,
+                max_retries=MAX_RETRIES,
+                max_tokens=GROUNDER_MAX_TOKENS,
+                context="Grounder"
+            )
+        except Exception as e:
+            logging.error(f"Grounder 处理失败: {e}")
+            raise
+
+        if bbox_flag:
+            bbox = None
+            for key in grounder_response:
+                if key.lower() in ["bbox", "bbox_2d", "bbox-2d", "bbox_2D", "bbox2d"]:
+                    bbox = grounder_response[key]
+                    break
+
+            if bbox is None:
+                raise ValueError("Grounder response validation failed: no bbox field found")
+
+            if use_qwen3:
+                bbox = convert_qwen3_coordinates_to_absolute(bbox, img.width, img.height, is_bbox=True)
+                x1, y1, x2, y2 = bbox
+            else:
+                x1, y1, x2, y2 = [int(coord / factor) for coord in bbox]
+        else:
+            coordinates = grounder_response["coordinates"]
+            if use_qwen3:
+                coordinates = convert_qwen3_coordinates_to_absolute(coordinates, img.width, img.height, is_bbox=False)
+                x, y = coordinates
+            else:
+                x, y = [int(coord / factor) for coord in coordinates]
+
+    if bbox_flag or use_e2e:
+        print(f"Clicking on bbox: [{x1}, {y1}, {x2}, {y2}]")
+        print(f"Image size: width={img.width}, height={img.height}")
+        print(f"Adjusted bbox: [{x1}, {y1}, {x2}, {y2}]")
+        position_x = (x1 + x2) // 2
+        position_y = (y1 + y2) // 2
+        device.click(position_x, position_y)
+        append_action_and_history(actions, history, decider_response, {
+            "type": "click",
+            "position_x": position_x,
+            "position_y": position_y,
+            "bounds": [x1, y1, x2, y2],
+            "action_index": image_index
+        })
+
+        img_path = os.path.join(device_paths["current_dir"], current_image)
+        save_path = os.path.join(data_dir, f"{image_index}_highlighted.jpg")
+        img = Image.open(img_path)
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.truetype("msyh.ttf", 40)
+        text = f"CLICK [{position_x}, {position_y}]"
+        text = textwrap.fill(text, width=20)
+        text_width, text_height = draw.textbbox((0, 0), text, font=font)[2:]
+        draw.text((img.width / 2 - text_width / 2, 0), text, fill="red", font=font)
+        img.save(save_path)
+
+        bounds_path = os.path.join(data_dir, f"{image_index}_bounds.jpg")
+        img_bounds = Image.open(save_path)
+        draw_bounds = ImageDraw.Draw(img_bounds)
+        draw_bounds.rectangle([x1, y1, x2, y2], outline='red', width=5)
+        img_bounds.save(bounds_path)
+
+        # 绘制点击位置
+        cv2image = cv2.imread(bounds_path)
+        if cv2image is not None:
+            cv2.circle(cv2image, (position_x, position_y), 15, (0, 255, 0), -1)
+            click_point_path = os.path.join(data_dir, f"{image_index}_click_point.jpg")
+            cv2.imwrite(click_point_path, cv2image)
+    else:
+        device.click(x, y)
+        append_action_and_history(actions, history, decider_response, {
+            "type": "click",
+            "position_x": x,
+            "position_y": y,
+            "action_index": image_index
+        })
+
+
+def handle_swipe_action(decider_response, device, img, use_e2e, use_qwen3, data_dir, image_index, actions, history):
+    direction = decider_response["parameters"]["direction"].upper()
+
+    if use_e2e:
+        start_coords = decider_response["parameters"].get("start_coords")
+        end_coords = decider_response["parameters"].get("end_coords")
+
+        if start_coords and end_coords:
+            if use_qwen3:
+                start_coords = convert_qwen3_coordinates_to_absolute(start_coords, img.width, img.height, is_bbox=False)
+                end_coords = convert_qwen3_coordinates_to_absolute(end_coords, img.width, img.height, is_bbox=False)
+
+            start_x, start_y = start_coords
+            end_x, end_y = end_coords
+
+            logging.info(f"E2E mode: swipe from [{start_x}, {start_y}] to [{end_x}, {end_y}]")
+            device.swipe_with_coords(start_x, start_y, end_x, end_y)
+
+            append_action_and_history(actions, history, decider_response, {
+                "type": "swipe",
+                "press_position_x": start_x,
+                "press_position_y": start_y,
+                "release_position_x": end_x,
+                "release_position_y": end_y,
+                "direction": direction.lower(),
+                "action_index": image_index
+            })
+            create_swipe_visualization(data_dir, image_index, direction.lower(), start_x, start_y, end_x, end_y)
+        else:
+            logging.warning("E2E mode: start_coords or end_coords not found, falling back to direction-based swipe")
+            press_position_x, press_position_y, release_position_x, release_position_y = compute_swipe_positions(direction, img.width, img.height)
+            device.swipe_with_coords(press_position_x, press_position_y, release_position_x, release_position_y,)
+            append_action_and_history(actions, history, decider_response, {
+                "type": "swipe",
+                "press_position_x": press_position_x,
+                "press_position_y": press_position_y,
+                "release_position_x": release_position_x,
+                "release_position_y": release_position_y,
+                "direction": direction.lower(),
+                "action_index": image_index
+            })
+            create_swipe_visualization(data_dir, image_index, direction.lower())
+    else:
+        press_position_x, press_position_y, release_position_x, release_position_y = compute_swipe_positions(direction, img.width, img.height)
+        device.swipe_with_coords(press_position_x, press_position_y, release_position_x, release_position_y,)
+        append_action_and_history(actions, history, decider_response, {
+            "type": "swipe",
+            "press_position_x": press_position_x,
+            "press_position_y": press_position_y,
+            "release_position_x": release_position_x,
+            "release_position_y": release_position_y,
+            "direction": direction.lower(),
+            "action_index": image_index
+        })
+        create_swipe_visualization(data_dir, image_index, direction.lower())
+
 def task_in_app(app, old_task, task, device, data_dir, bbox_flag=True, use_qwen3=True, device_type="Android", use_e2e=False):
     history = []
     actions = []
     reacts = []
+    grounder_prompt_template_bbox = None
+    grounder_prompt_template_no_bbox = None
 
     if use_e2e:
-        # 在e2e模式下使用e2e_qwen3.md，否则使用decider_v2.md
-        decider_prompt_template = load_prompt("e2e_qwen3.md")
+        # 在e2e模式下使用e2e流程
         logging.info("Using e2e mode with e2e_qwen3.md")
 
     elif use_qwen3:
         grounder_prompt_template_bbox = load_prompt("grounder_qwen3_bbox.md")
         grounder_prompt_template_no_bbox = load_prompt("grounder_qwen3_coordinates.md")
-        
-        decider_prompt_template = load_prompt("decider_v2.md")
 
     else:
         grounder_prompt_template_bbox = load_prompt("grounder_bbox.md")
         grounder_prompt_template_no_bbox = load_prompt("grounder_coordinates.md")
-        decider_prompt_template = load_prompt("decider_v2.md")
     while True:     
         if len(actions) >= MAX_STEPS:
             logging.info("Reached maximum steps, stopping the task.")
             break
-        
-        if len(history) == 0:
-            history_str = "(No history)"
-        else:
-            history_str = "\n".join(f"{idx}. {h}" for idx, h in enumerate(history, 1))
+
         screenshot_resize = get_screenshot(device, device_type)
 
         
@@ -906,39 +1140,7 @@ def task_in_app(app, old_task, task, device, data_dir, bbox_flag=True, use_qwen3
                 pass
 
         # 根据设备类型保存hierarchy
-        
-        if device_type == "Android":
-            logging.info("Dumping UI hierarchy...")
-            try:
-                hierarchy = device.dump_hierarchy()
-            except Exception as e:
-                logging.error(f"Failed to dump UI hierarchy: {e}")
-                hierarchy = "<hierarchy_dump_failed/>"
-            # Android设备保存为XML格式
-            hierarchy_path = os.path.join(data_dir, f"{image_index}.xml")
-            with open(hierarchy_path, "w", encoding="utf-8") as f:
-                f.write(hierarchy)
-        else:
-            try:
-                hierarchy = device.dump_hierarchy()
-            except Exception as e:
-                logging.error(f"Failed to dump UI hierarchy: {e}")
-                hierarchy = {}
-            # Harmony设备保存为JSON格式
-            hierarchy_path = os.path.join(data_dir, f"{image_index}.json")
-            try:
-                # 尝试将hierarchy解析为JSON（如果已是JSON字符串）
-                if isinstance(hierarchy, str):
-                    hierarchy_json = json.loads(hierarchy)
-                else:
-                    hierarchy_json = hierarchy
-                with open(hierarchy_path, "w", encoding="utf-8") as f:
-                    json.dump(hierarchy_json, f, ensure_ascii=False, indent=2)
-            except (json.JSONDecodeError, TypeError):
-                # 如果解析失败，直接保存为字符串
-                logging.warning(f"Failed to parse hierarchy as JSON, saving as plain text")
-                with open(hierarchy_path, "w", encoding="utf-8") as f:
-                    f.write(str(hierarchy))
+        save_hierarchy(device, device_type, data_dir, image_index)
         
         if action == "done":
             print("Task completed.")
@@ -949,248 +1151,49 @@ def task_in_app(app, old_task, task, device, data_dir, bbox_flag=True, use_qwen3
                 "action_index": image_index
             })
             break
-        if action == "click":
-            reasoning = decider_response["reasoning"]
-            target_element = decider_response["parameters"]["target_element"]
-            
-            # e2e模式：直接从decider获取bbox，不调用grounder
-            if use_e2e:
-                bbox = decider_response["parameters"]["bbox"]
-                if bbox is None:
-                    logging.error("E2E mode: bbox not found in decider response")
-                    raise ValueError("E2E mode requires bbox in decider response")
-                
-                logging.info(f"E2E mode: Using bbox directly from decider: {bbox}")
-                # 使用 Qwen3 模型进行坐标转换
-                if use_qwen3:
-                    bbox = convert_qwen3_coordinates_to_absolute(bbox, img.width, img.height, is_bbox=True)
-                x1, y1, x2, y2 = bbox
-            else:
-                # 调用 Grounder 获取坐标
-                grounder_prompt = (grounder_prompt_template_bbox if bbox_flag else grounder_prompt_template_no_bbox).format(reasoning=reasoning, description=target_element)
-                
-                try:
-                    grounder_response = call_model_with_validation_retry(
-                        grounder_client,
-                        grounder_model,
-                        [
-                            {
-                                "role": "user",
-                                "content": [
-                                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{screenshot_resize}"}},
-                                    {"type": "text", "text": grounder_prompt},
-                                ]
-                            }
-                        ],
-                        validator_func=validate_grounder_response,
-                        max_retries=MAX_RETRIES,
-                        max_tokens=GROUNDER_MAX_TOKENS,
-                        context="Grounder"
-                    )
-                except Exception as e:
-                    logging.error(f"Grounder 处理失败: {e}")
-                    raise
 
-                if bbox_flag:
-                    # 获取bbox字段（validate_grounder_response已确保存在）
-                    bbox = None
-                    for key in grounder_response:
-                        if key.lower() in ["bbox", "bbox_2d", "bbox-2d", "bbox_2D", "bbox2d"]:
-                            bbox = grounder_response[key]
-                            break
-                    
-                    if bbox is None:
-                        raise ValueError("Grounder response validation failed: no bbox field found")
+        action_handlers = {
+            "click": lambda: handle_click_action(
+                decider_response, device, img, screenshot_resize,
+                grounder_prompt_template_bbox, grounder_prompt_template_no_bbox,
+                bbox_flag, use_qwen3, use_e2e,
+                data_dir, device_paths, current_image, image_index, actions, history
+            ),
+            "swipe": lambda: handle_swipe_action(
+                decider_response, device, img, use_e2e, use_qwen3,
+                data_dir, image_index, actions, history
+            ),
+            "click_input": lambda: handle_click_input_action(decider_response, device, img, image_index, actions, history),
+            "input": lambda: handle_input_action(decider_response, device, image_index, actions, history),
+            "open_app": lambda: handle_open_app_action(decider_response, device, image_index, actions, history),
+            "press_home": lambda: handle_press_home_action(decider_response, device, device_type, image_index, actions, history),
+            "press_back": lambda: handle_press_back_action(decider_response, device, device_type, image_index, actions, history),
+            "wait": lambda: handle_wait_action(decider_response, image_index, actions, history),
+        }
 
-                    # 如果使用 Qwen3 模型，进行坐标转换
-                    if use_qwen3:
-                        bbox = convert_qwen3_coordinates_to_absolute(bbox, img.width, img.height, is_bbox=True)
-                        x1, y1, x2, y2 = bbox
-                    else:
-                        x1, y1, x2, y2 = [int(coord/factor) for coord in bbox]
-
-                else:
-                    coordinates = grounder_response["coordinates"]
-                    if use_qwen3:
-                        coordinates = convert_qwen3_coordinates_to_absolute(coordinates, img.width, img.height, is_bbox=False)
-                        x, y = coordinates
-                    else:
-                        x, y = [int(coord / factor) for coord in coordinates]
-            
-            # 通用的click处理逻辑（e2e和非e2e都使用）
-            if bbox_flag or use_e2e:
-                print(f"Clicking on bbox: [{x1}, {y1}, {x2}, {y2}]")
-                print(f"Image size: width={img.width}, height={img.height}")
-                print(f"Adjusted bbox: [{x1}, {y1}, {x2}, {y2}]")
-                position_x = (x1 + x2) // 2
-                position_y = (y1 + y2) // 2
-                device.click(position_x, position_y)
-                # save action (record index only)
-                actions.append({
-                    "type": "click",
-                    "position_x": position_x,
-                    "position_y": position_y,
-                    "bounds": [x1, y1, x2, y2],
-                    "action_index": image_index
-                })
-                history.append(json.dumps(decider_response, ensure_ascii=False))
-
-                # 创建可视化图像
-                img_path = os.path.join(device_paths["current_dir"], current_image)
-                save_path = os.path.join(data_dir, f"{image_index}_highlighted.jpg")
-                img = Image.open(img_path)
-                draw = ImageDraw.Draw(img)
-                font = ImageFont.truetype("msyh.ttf", 40)
-                text = f"CLICK [{position_x}, {position_y}]"
-                text = textwrap.fill(text, width=20)
-                text_width, text_height = draw.textbbox((0, 0), text, font=font)[2:]
-                draw.text((img.width / 2 - text_width / 2, 0), text, fill="red", font=font)
-                img.save(save_path)
-
-                # 绘制边界框
-                bounds_path = os.path.join(data_dir, f"{image_index}_bounds.jpg")
-                img_bounds = Image.open(save_path)
-                draw_bounds = ImageDraw.Draw(img_bounds)
-                draw_bounds.rectangle([x1, y1, x2, y2], outline='red', width=5)
-                img_bounds.save(bounds_path)
-
-                # 绘制点
-                cv2image = cv2.imread(bounds_path)
-                if cv2image is not None:
-                    # 在点击位置画圆点
-                    cv2.circle(cv2image, (position_x, position_y), 15, (0, 255, 0), -1)  # 绿色实心圆
-                    # 保存带点击点的图像
-                    click_point_path = os.path.join(data_dir, f"{image_index}_click_point.jpg")
-                    cv2.imwrite(click_point_path, cv2image)
-            else:
-                # 非bbox_flag的情况（使用coordinates）
-                device.click(x, y)
-                actions.append({
-                    "type": "click",
-                    "position_x": x,
-                    "position_y": y,
-                    "action_index": image_index
-                })
-                history.append(json.dumps(decider_response, ensure_ascii=False))
-                
-        elif action == "click_input":
-            reasoning = decider_response["reasoning"]
-            target_element = decider_response["parameters"]["target_element"]
-            text = decider_response["parameters"]["text"]
-            bbox = decider_response["parameters"]["bbox"]
-            bbox = convert_qwen3_coordinates_to_absolute(bbox, img.width, img.height, is_bbox=True)
-            x1, y1, x2, y2 = bbox
-            position_x = (x1 + x2) // 2
-            position_y = (y1 + y2) // 2
-
-            device.click(position_x, position_y)
-            actions.append({
-                "type": "click_input",
-                "position_x": position_x,
-                "position_y": position_y,
-                "bounds": [x1, y1, x2, y2],
-                "text": f"{text}",
-                "action_index": image_index
-            })
-
-            device.input(text)
-            history.append(json.dumps(decider_response, ensure_ascii=False))
-
-        elif action == "input":
-            text = decider_response["parameters"]["text"]
-            device.input(text)
-            actions.append({
-                "type": "input",
-                "text": text,
-                "action_index": image_index
-            })
-            
-            history.append(json.dumps(decider_response, ensure_ascii=False))
-
-        elif action == "swipe":
-            direction = decider_response["parameters"]["direction"]
-            direction = direction.upper()
-            
-            # e2e模式：尝试获取起始和结束坐标
-            if use_e2e:
-                start_coords = decider_response["parameters"].get("start_coords")
-                end_coords = decider_response["parameters"].get("end_coords")
-                
-                if start_coords and end_coords:
-                    # 进行坐标转换（如果需要）
-                    if use_qwen3:
-                        start_coords = convert_qwen3_coordinates_to_absolute(start_coords, img.width, img.height, is_bbox=False)
-                        end_coords = convert_qwen3_coordinates_to_absolute(end_coords, img.width, img.height, is_bbox=False)
-                    
-                    start_x, start_y = start_coords
-                    end_x, end_y = end_coords
-                    
-                    logging.info(f"E2E mode: swipe from [{start_x}, {start_y}] to [{end_x}, {end_y}]")
-                    device.swipe_with_coords(start_x, start_y, end_x, end_y)
-                    
-                    actions.append({
-                        "type": "swipe",
-                        "press_position_x": start_x,
-                        "press_position_y": start_y,
-                        "release_position_x": end_x,
-                        "release_position_y": end_y,
-                        "direction": direction.lower(),
-                        "action_index": image_index
-                    })
-                    history.append(json.dumps(decider_response, ensure_ascii=False))
-                    create_swipe_visualization(data_dir, image_index, direction.lower(), start_x, start_y, end_x, end_y)
-                else:
-                    logging.warning("E2E mode: start_coords or end_coords not found, falling back to direction-based swipe")
-                    press_position_x, press_position_y, release_position_x, release_position_y = compute_swipe_positions(direction, img.width, img.height)
-                    device.swipe_with_coords(press_position_x, press_position_y, release_position_x, release_position_y,)
-                    actions.append({
-                        "type": "swipe",
-                        "press_position_x": press_position_x,
-                        "press_position_y": press_position_y,
-                        "release_position_x": release_position_x,
-                        "release_position_y": release_position_y,
-                        "direction": direction.lower(),
-                        "action_index": image_index
-                    })
-                    history.append(json.dumps(decider_response, ensure_ascii=False))
-                    create_swipe_visualization(data_dir, image_index, direction.lower())
-            else:
-                press_position_x, press_position_y, release_position_x, release_position_y = compute_swipe_positions(direction, img.width, img.height)
-                device.swipe_with_coords(press_position_x, press_position_y, release_position_x, release_position_y,)
-                actions.append({
-                    "type": "swipe",
-                    "press_position_x": press_position_x,
-                    "press_position_y": press_position_y,
-                    "release_position_x": release_position_x,
-                    "release_position_y": release_position_y,
-                    "direction": direction.lower(),
-                    "action_index": image_index
-                })
-                    
-                history.append(json.dumps(decider_response, ensure_ascii=False))
-                
-                # 为滑动创建可视化
-                create_swipe_visualization(data_dir, image_index, direction.lower())
-
-            # else:
-            #     raise ValueError(f"Unknown swipe direction: {direction}")
-        elif action == "wait":
-            print("Waiting for a while...")
-            actions.append({
-                "type": "wait",
-                "action_index": image_index
-            })
-            time.sleep(DEVICE_WAIT_TIME * 2)
-            history.append(json.dumps(decider_response, ensure_ascii=False))
-        else:
+        handler = action_handlers.get(action)
+        if handler is None:
             raise ValueError(f"Unknown action: {action}")
+        handler()
         
+    
+    from datetime import datetime
+    
+    # 获取当前日期、星期和时间
+    now = datetime.now()
+    weekdays = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日']
+    execution_timestamp = {
+        "date": now.strftime("%Y-%m-%d"),
+        "weekday": weekdays[now.weekday()],
+        "time": now.strftime("%H:%M:%S")
+    }
     
     data = {
         "app_name": app,
         "task_type": None,
         "old_task_description": old_task,
         "task_description": task,
+        "execution_timestamp": execution_timestamp,
         "action_count": len(actions),
         "actions": actions
     }
@@ -1334,7 +1337,6 @@ if __name__ == "__main__":
     parser.add_argument("--decider_port", type=int, default=8000, help="Port for decider service (default: 8000)")
     parser.add_argument("--grounder_port", type=int, default=8001, help="Port for grounder service (default: 8001)")
     parser.add_argument("--planner_port", type=int, default=8002, help="Port for planner service (default: 8002)")
-    parser.add_argument("--api_key", type=str, default="mobiagent-key", help="API key for model services (default: mobiagent-key)")
     parser.add_argument("--user_profile", choices=["on", "off"], default="off", help="Enable user profile memory (default: off)")
     parser.add_argument("--use_graphrag", choices=["on", "off"], default="off", help="Use GraphRAG for user profile preference memory (default: off)")
     parser.add_argument("--clear_memory", action="store_true", help="Force clear all stored user memories and exit")
@@ -1349,7 +1351,7 @@ if __name__ == "__main__":
     # 使用命令行参数初始化
     enable_user_profile = (args.user_profile == "on")
     use_graphrag = (args.use_graphrag == "on")
-    init(args.service_ip, args.decider_port, args.grounder_port, args.planner_port, args.api_key,
+    init(args.service_ip, args.decider_port, args.grounder_port, args.planner_port,
         enable_user_profile=enable_user_profile, use_graphrag=use_graphrag)
 
     # 如果需要清除记忆，优先执行并退出

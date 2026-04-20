@@ -1,0 +1,16 @@
+{
+  "simulators": [
+    {
+      "name": "模拟器1",
+      "backend_url": "http://xxxxxxx:9000",
+      "adb_endpoint": "xxxxxxx:8000",
+      "init_device": "emulator-5554"
+    },
+    {
+      "name": "模拟器2",
+      "backend_url": "http://xxxxxxx:9001",
+      "adb_endpoint": "xxxxxxx:8080",
+      "init_device": "emulator-5554"
+    }
+  ]
+}
