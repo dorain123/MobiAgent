@@ -52,6 +52,12 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument("--openrouter_base_url", type=str, default="https://openrouter.ai/api/v1", help="Explorer base URL")
     parser.add_argument("--openrouter_api_key", type=str, default=os.getenv("OPENROUTER_API_KEY", ""), help="Explorer API key")
     parser.add_argument("--explorer_model", type=str, default="google/gemini-3-flash-preview", help="Explorer model name")
+    parser.add_argument(
+        "--explorer_disable_thinking",
+        choices=["on", "off"],
+        default="off",
+        help="Disable Qwen reasoning/thinking mode for Explorer requests",
+    )
 
     parser.add_argument("--use_qwen3", choices=["on", "off"], default="on", help="Whether to use Qwen3 coordinate conversion")
     parser.add_argument(
@@ -150,6 +156,7 @@ def run(args: argparse.Namespace) -> Dict[str, Any]:
 
     decider_client = init_decider_client(args.service_ip, args.decider_port, args.decider_base_url, args.decider_api_key)
     explorer_client = init_explorer_client(explorer_base_url, explorer_api_key)
+    explorer_disable_thinking = args.explorer_disable_thinking == "on"
     use_qwen3 = args.use_qwen3 == "on"
     allow_hierarchy_text_decider = args.allow_hierarchy_text_decider == "on"
     enable_ui_semantic_collect = args.enable_ui_semantic_collect == "on"
@@ -230,6 +237,7 @@ def run(args: argparse.Namespace) -> Dict[str, Any]:
             decider_model=decider_model,
             explorer_client=explorer_client,
             explorer_model=args.explorer_model,
+            explorer_disable_thinking=explorer_disable_thinking,
             device=device,
             device_type=args.device,
             use_qwen3=use_qwen3,

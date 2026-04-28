@@ -59,6 +59,42 @@ def _extract_response_text(response: Any) -> str:
     return ""
 
 
+def _extract_json_object_text(text: str) -> str:
+    stripped = str(text or "").strip()
+    if not stripped:
+        return stripped
+    if stripped.startswith("```"):
+        stripped = stripped.strip("`").strip()
+        if stripped.lower().startswith("json"):
+            stripped = stripped[4:].strip()
+    start = stripped.find("{")
+    if start < 0:
+        return stripped
+    depth = 0
+    in_string = False
+    escape = False
+    for idx in range(start, len(stripped)):
+        ch = stripped[idx]
+        if escape:
+            escape = False
+            continue
+        if ch == "\\" and in_string:
+            escape = True
+            continue
+        if ch == '"':
+            in_string = not in_string
+            continue
+        if in_string:
+            continue
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return stripped[start : idx + 1]
+    return stripped[start:]
+
+
 def _clamp_score(value: Any, field_name: str) -> int:
     try:
         score = int(round(float(value)))
@@ -309,6 +345,7 @@ class LLMTrajectoryJudge:
         judge_mode: str = JUDGE_MODE_LEGACY_TEXT,
         temperature: float = 0.0,
         max_tokens: int = 700,
+        enable_thinking: bool = True,
         max_steps: int = 30,
         max_reasoning_chars: int = 320,
     ) -> None:
@@ -318,6 +355,7 @@ class LLMTrajectoryJudge:
         self.judge_mode = judge_mode
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.enable_thinking = enable_thinking
         self.max_steps = max_steps
         self.max_reasoning_chars = max_reasoning_chars
 
@@ -328,14 +366,18 @@ class LLMTrajectoryJudge:
             max_steps=self.max_steps,
             max_reasoning_chars=self.max_reasoning_chars,
         )
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=self.temperature,
-            max_tokens=self.max_tokens,
-        )
+        request_kwargs = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
+            "extra_body": {"chat_template_kwargs": {"enable_thinking": self.enable_thinking}},
+        }
+        if "qwen" not in self.model.lower():
+            request_kwargs["response_format"] = {"type": "json_object"}
+        response = self.client.chat.completions.create(**request_kwargs)
         raw_text = _extract_response_text(response).strip()
-        payload = robust_json_loads(raw_text)
+        payload = robust_json_loads(_extract_json_object_text(raw_text))
         if not isinstance(payload, dict):
             raise ValueError(f"Judge response is not a JSON object: {raw_text}")
         normalized = _normalize_judge_payload(payload, judge_mode=self.judge_mode)

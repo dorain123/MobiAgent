@@ -1,0 +1,40 @@
+C:\Users\28125\anaconda3\envs\MobiAgent\lib\site-packages\requests\__init__.py:113: RequestsDependencyWarning: urllib3 (1.26.15) or chardet (7.2.0)/charset_normalizer (3.4.6) doesn't match a supported version!
+  warnings.warn(
+[33mChecking connectivity to the model hosters, this may take a while. To bypass this check, set `PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK` to `True`.[0m
+INFO: Could not find files for the given pattern(s).
+C:\Users\28125\anaconda3\envs\MobiAgent\lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[2026-04-20 20:53:55,660] [   ERROR] ocr_engine.py:39 - TesseractŒ¥’˝»∑∞≤◊∞ªÚ≈‰÷√: tesseract is not installed or it's not in your PATH. See README file for more information.
+C:\Users\28125\anaconda3\envs\MobiAgent\lib\site-packages\torch\compiler\__init__.py:148: FutureWarning: torch._dynamo.allow_in_graph is deprecated and will be removed in a future version. Use torch._dynamo.nonstrict_trace instead.
+  return torch._dynamo.allow_in_graph(fn)
+LLM is explicitly disabled. Using MockLLM.
+2026-04-20 20:54:08,426 - INFO - Initializing explorer client with base_url=https://openrouter.ai/api/v1
+2026-04-20 20:54:08,426 - INFO - API Key is set: True
+2026-04-20 20:54:08,466 - INFO - Explorer provider base_url=https://openrouter.ai/api/v1
+2026-04-20 20:54:08,466 - INFO - UI collect provider base_url=https://openrouter.ai/api/v1
+2026-04-20 20:54:08,466 - INFO - Experiment tag=E0_full
+2026-04-20 20:54:08,466 - INFO - Feature flags=FeatureFlags(triple_verify=True, replay_recovery=True, candidate_dedup=True, already_explored_filter=True, explorer_cache=True, screen_cache=True, popup_auto_dismiss=True, async_artifact_io=True, concurrent_fingerprint=True, hierarchy_text_decider=True)
+2026-04-20 20:54:08,466 - INFO - Starting app: Ã‘±¶
+2026-04-20 20:54:18,512 - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-20 20:54:18,514 - WARNING - Explorer model parse/call failed (attempt=1): Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+2026-04-20 20:54:20,035 - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-20 20:54:20,036 - WARNING - Explorer model parse/call failed (attempt=2): Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+2026-04-20 20:54:21,637 - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-20 20:54:21,638 - WARNING - Explorer model parse/call failed (attempt=3): Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+2026-04-20 20:54:22,848 - INFO - Auto-search finished. data_dir=results\ablation\E0_full\run_001\data metrics=results\ablation\E0_full\run_001\metrics.json
+Traceback (most recent call last):
+  File "C:\Users\28125\anaconda3\envs\MobiAgent\lib\runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "C:\Users\28125\anaconda3\envs\MobiAgent\lib\runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "D:\cdl\MobiAgent\auto_explore\src\auto_explore\cli\auto_search.py", line 304, in <module>
+    main()
+  File "D:\cdl\MobiAgent\auto_explore\src\auto_explore\cli\auto_search.py", line 300, in main
+    run(args)
+  File "D:\cdl\MobiAgent\auto_explore\src\auto_explore\cli\auto_search.py", line 221, in run
+    explore_dfs(
+  File "D:\cdl\MobiAgent\auto_explore\src\auto_explore\core\dfs.py", line 178, in explore_dfs
+    candidates, popup_info = call_explorer_model(
+  File "D:\cdl\MobiAgent\auto_explore\src\auto_explore\core\explorer.py", line 267, in call_explorer_model
+    raise RuntimeError(f"Explorer model failed after retries: {last_err}")
+RuntimeError: Explorer model failed after retries: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}

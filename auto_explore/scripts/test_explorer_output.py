@@ -6,6 +6,7 @@ import collections
 import json
 import os
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -39,16 +40,16 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--base-url",
         type=str,
-        default="https://models.sjtu.edu.cn/api/v1",
+        default="http://166.111.53.96:7002/v1",
         help="Explorer provider base URL",
     )
     parser.add_argument(
         "--api-key",
         type=str,
-        default=os.getenv("OPENROUTER_API_KEY", ""),
+        default="mobiagent-key",
         help="Explorer API key, defaults to OPENROUTER_API_KEY",
     )
-    parser.add_argument("--model", type=str, default="qwen3vl", help="Explorer model name")
+    parser.add_argument("--model", type=str, default="Qwen3.5-35B-A3B", help="Explorer model name")
     parser.add_argument("--depth", type=int, default=1, help="Depth passed into build_explorer_prompt")
     parser.add_argument("--breadth", type=int, default=3, help="Breadth passed into build_explorer_prompt")
     parser.add_argument(
@@ -67,6 +68,11 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("--temperature", type=float, default=0.0, help="temperature sent to Explorer")
     parser.add_argument("--timeout", type=float, default=45, help="timeout sent to Explorer")
     parser.add_argument("--repeat", type=int, default=1, help="Number of repeated Explorer calls to run")
+    parser.add_argument(
+        "--disable-thinking",
+        action="store_true",
+        help="Send chat_template_kwargs.enable_thinking=false for Qwen reasoning models",
+    )
     parser.add_argument(
         "--response-format",
         type=str,
@@ -210,6 +216,7 @@ def main() -> None:
 
     counts: collections.Counter[str] = collections.Counter()
     saved_raw_paths: list[str] = []
+    latencies: list[float] = []
 
     for run_idx in range(1, args.repeat + 1):
         request_kwargs: dict[str, Any] = {
@@ -229,10 +236,13 @@ def main() -> None:
         }
         if args.response_format == "json_object":
             request_kwargs["response_format"] = {"type": "json_object"}
+        if args.disable_thinking:
+            request_kwargs["extra_body"] = {"chat_template_kwargs": {"enable_thinking": False}}
 
-        response = client.chat.completions.create(
-            **request_kwargs,
-        )
+        request_started = time.perf_counter()
+        response = client.chat.completions.create(**request_kwargs)
+        elapsed_sec = time.perf_counter() - request_started
+        latencies.append(elapsed_sec)
 
         choice = response.choices[0]
         finish_reason = getattr(choice, "finish_reason", None)
@@ -240,6 +250,7 @@ def main() -> None:
         diagnostics = _build_response_diagnostics(content, finish_reason=finish_reason)
 
         print(f"===== RUN {run_idx}/{args.repeat} =====")
+        print(f"elapsed_sec = {elapsed_sec:.3f}")
         print(f"finish_reason = {finish_reason}")
         print(f"content_length = {len(content)}")
         print("diagnostics =")
@@ -274,6 +285,17 @@ def main() -> None:
     if args.repeat > 1:
         print("===== SUMMARY =====")
         print(json.dumps(dict(sorted(counts.items())), ensure_ascii=False, indent=2))
+        sorted_latencies = sorted(latencies)
+        latency_summary = {
+            "count": len(sorted_latencies),
+            "avg_sec": sum(sorted_latencies) / len(sorted_latencies),
+            "min_sec": sorted_latencies[0],
+            "p50_sec": sorted_latencies[len(sorted_latencies) // 2],
+            "p90_sec": sorted_latencies[max(0, int(len(sorted_latencies) * 0.9) - 1)],
+            "max_sec": sorted_latencies[-1],
+        }
+        print("latency_summary =")
+        print(json.dumps(latency_summary, ensure_ascii=False, indent=2))
         if saved_raw_paths:
             print("saved_raw_files =")
             print(json.dumps(saved_raw_paths, ensure_ascii=False, indent=2))

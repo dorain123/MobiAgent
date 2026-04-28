@@ -58,6 +58,12 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     )
     parser.add_argument("--temperature", type=float, default=0.0, help="Judge sampling temperature")
     parser.add_argument("--max_tokens", type=int, default=700, help="Max tokens per judge call")
+    parser.add_argument(
+        "--enable_thinking",
+        choices=["on", "off"],
+        default=os.getenv("AUTO_EXPLORE_EVAL_ENABLE_THINKING", "on"),
+        help="Enable Qwen thinking mode for judge calls when supported",
+    )
     parser.add_argument("--max_steps", type=int, default=30, help="Max steps included in each prompt")
     parser.add_argument("--max_reasoning_chars", type=int, default=320, help="Max reasoning chars per step in prompt")
     parser.add_argument(
@@ -105,6 +111,7 @@ def run(args: argparse.Namespace) -> Dict[str, Any]:
         judge_mode=args.judge_mode,
         temperature=args.temperature,
         max_tokens=args.max_tokens,
+        enable_thinking=args.enable_thinking == "on",
         max_steps=args.max_steps,
         max_reasoning_chars=args.max_reasoning_chars,
     )

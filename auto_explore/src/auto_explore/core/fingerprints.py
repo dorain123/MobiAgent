@@ -1,6 +1,7 @@
 import concurrent.futures
 import hashlib
 import json
+import logging
 import re
 import time
 import xml.etree.ElementTree as ET
@@ -258,6 +259,205 @@ def _triple_verify(
     return (int(fp_ok) + int(struct_ok) + int(visual_ok)) >= 2
 
 
+def _parse_bounds_attr(value: Any) -> Optional[List[int]]:
+    if isinstance(value, (list, tuple)) and len(value) == 4:
+        try:
+            return [int(v) for v in value]
+        except Exception:
+            return None
+    if not isinstance(value, str):
+        return None
+    nums = re.findall(r"-?\d+", value)
+    if len(nums) != 4:
+        return None
+    try:
+        return [int(v) for v in nums]
+    except Exception:
+        return None
+
+
+def _stable_label_from_text(text: str, desc: str = "") -> str:
+    label = (text or desc or "").strip()
+    if not label:
+        return ""
+    for token in (
+        "已选中",
+        "未选中",
+        "选中",
+        "按钮",
+        "，",
+        ",",
+        "。",
+        "：",
+        ":",
+    ):
+        label = label.replace(token, " ")
+    label = " ".join(label.split())
+    return label.strip()
+
+
+def _collect_xml_stable_tab_texts(root: ET.Element) -> set[str]:
+    """Find top/bottom horizontal tab rows whose nodes often lack resource-id/class hints."""
+    nodes: List[dict[str, Any]] = []
+    screen_bottom = 0
+
+    for node in root.iter():
+        bounds = _parse_bounds_attr(node.attrib.get("bounds", ""))
+        if not bounds:
+            continue
+        screen_bottom = max(screen_bottom, bounds[3])
+        text = str(node.attrib.get("text", "") or "").strip()
+        desc = str(node.attrib.get("content-desc", "") or node.attrib.get("contentDescription", "") or "").strip()
+        label = _stable_label_from_text(text, desc)
+        if not label:
+            continue
+        if label.isdigit() or re.fullmatch(r"\d+(\.\d+)?", label):
+            continue
+        width = bounds[2] - bounds[0]
+        height = bounds[3] - bounds[1]
+        if width <= 0 or height <= 0 or width > 220 or height > 120:
+            continue
+        cls = str(node.attrib.get("class", "") or "")
+        selected = str(node.attrib.get("selected", "false")).lower() in {"true", "1"}
+        desc_has_tab_state = "选中" in desc or "selected" in desc.lower()
+        is_text_or_button = "TextView" in cls or "Button" in cls or desc_has_tab_state or selected
+        if not is_text_or_button:
+            continue
+        center_y = (bounds[1] + bounds[3]) // 2
+        nodes.append(
+            {
+                "label": label,
+                "bounds": bounds,
+                "center_y": center_y,
+                "selected": selected,
+                "tab_hint": selected or desc_has_tab_state,
+            }
+        )
+
+    if not nodes:
+        return set()
+
+    stable: set[str] = set()
+    for current in nodes:
+        row = [item for item in nodes if abs(item["center_y"] - current["center_y"]) <= 28]
+        if len(row) < 3:
+            continue
+        min_x = min(item["bounds"][0] for item in row)
+        max_x = max(item["bounds"][2] for item in row)
+        min_y = min(item["bounds"][1] for item in row)
+        max_y = max(item["bounds"][3] for item in row)
+        is_top_bar = 55 <= min_y <= 220
+        is_bottom_bar = bool(screen_bottom and max_y >= screen_bottom - 220)
+        has_tab_hint = any(item["tab_hint"] for item in row)
+        if not (has_tab_hint and (is_top_bar or is_bottom_bar) and (max_x - min_x) >= 180):
+            continue
+        for item in row:
+            stable.add(_normalize_hierarchy_text(item["label"]))
+
+    return stable
+
+
+def _stable_text_set(hierarchy_text: str) -> set[str]:
+    """Extract stable nav/title labels and ignore dynamic list/feed content."""
+    stable_texts: set[str] = set()
+    if not hierarchy_text:
+        return stable_texts
+
+    def _accept(text: str, res_id: str, cls: str, *, selected: bool = False, desc: str = "") -> None:
+        label = _stable_label_from_text(text, desc)
+        if not label:
+            return
+        if selected or any(kw in res_id.lower() for kw in _STABLE_RESOURCE_ID_KEYWORDS) or any(
+            kw in cls for kw in _STABLE_CLASS_KEYWORDS
+        ):
+            stable_texts.add(_normalize_hierarchy_text(label))
+
+    try:
+        if hierarchy_text.lstrip().startswith("<"):
+            root = ET.fromstring(hierarchy_text)
+            for node in root.iter():
+                _accept(
+                    node.attrib.get("text", ""),
+                    node.attrib.get("resource-id", ""),
+                    node.attrib.get("class", ""),
+                    selected=str(node.attrib.get("selected", "false")).lower() in {"true", "1"},
+                    desc=node.attrib.get("content-desc", "") or node.attrib.get("contentDescription", ""),
+                )
+            stable_texts.update(_collect_xml_stable_tab_texts(root))
+            return stable_texts
+
+        obj = json.loads(hierarchy_text)
+    except Exception:
+        return stable_texts
+
+    def _walk(node: Any) -> None:
+        if isinstance(node, dict):
+            attrs = node.get("attributes") if isinstance(node.get("attributes"), dict) else node
+            if isinstance(attrs, dict):
+                _accept(
+                    str(attrs.get("text", attrs.get("content", ""))),
+                    str(attrs.get("resource-id", attrs.get("id", ""))),
+                    str(attrs.get("className", attrs.get("class", ""))),
+                    selected=str(attrs.get("selected", "false")).lower() in {"true", "1"},
+                    desc=str(attrs.get("contentDescription", attrs.get("content-desc", ""))),
+                )
+            for value in node.values():
+                _walk(value)
+        elif isinstance(node, list):
+            for item in node:
+                _walk(item)
+
+    _walk(obj)
+    return stable_texts
+
+
+def _relaxed_verify(
+    pre_hierarchy: str,
+    pre_struct_fp: str,
+    pre_dhash: str,
+    post_hierarchy: str,
+    post_screenshot_path: str,
+    *,
+    concurrent_mode: bool = True,
+) -> bool:
+    """Verify recovery using stable UI regions instead of dynamic list contents."""
+    pre_stable = _stable_text_set(pre_hierarchy)
+    post_stable = _stable_text_set(post_hierarchy)
+    stable_exact = bool(pre_stable and pre_stable == post_stable)
+    stable_overlap = 0.0
+    if pre_stable and post_stable:
+        stable_overlap = len(pre_stable & post_stable) / max(1, min(len(pre_stable), len(post_stable)))
+
+    _, post_struct_fp_val, post_dhash = compute_fingerprints(
+        post_hierarchy,
+        screenshot_path=post_screenshot_path,
+        concurrent_mode=concurrent_mode,
+    )
+    struct_ok = bool(pre_struct_fp and pre_struct_fp == post_struct_fp_val)
+    dhash_distance = _hamming_distance_hex(pre_dhash, post_dhash) if pre_dhash and post_dhash else 64
+    visual_ok = dhash_distance <= 8
+    stable_ok = stable_exact or stable_overlap >= 0.6
+
+    logging.info(
+        "Relaxed verify: stable_ok=%s overlap=%.2f struct_ok=%s visual_ok=%s dhash=%s",
+        stable_ok,
+        stable_overlap,
+        struct_ok,
+        visual_ok,
+        dhash_distance,
+    )
+    if pre_stable or post_stable:
+        return stable_ok or (struct_ok and visual_ok)
+    return _triple_verify(
+        pre_hierarchy,
+        pre_struct_fp,
+        pre_dhash,
+        post_hierarchy,
+        post_screenshot_path,
+        concurrent_mode=concurrent_mode,
+    )
+
+
 def _bbox_iou(a: List[int], b: List[int]) -> float:
     ax1, ay1, ax2, ay2 = a
     bx1, by1, bx2, by2 = b
@@ -348,6 +548,8 @@ __all__ = [
     "_now_ts",
     "_safe_future",
     "_simple_verify",
+    "_relaxed_verify",
+    "_stable_text_set",
     "_stable_text_fingerprint",
     "_triple_verify",
     "compute_fingerprints",

@@ -7,7 +7,7 @@ from test_support import install_test_stubs, make_workspace_tempdir, remove_work
 install_test_stubs()
 
 from auto_explore.core.decider import execute_decider_one_step
-from auto_explore.core.dfs import explore_dfs
+from auto_explore.core.dfs import _get_repeat_skip_reason, explore_dfs
 
 
 class _Metrics:
@@ -192,6 +192,160 @@ class DfsProgressGateTests(TestCase):
             self.assertEqual(path_counter[0], 0)
             self.assertEqual(partial_path_counter[0], 0)
             mocked_copy_to_path.assert_not_called()
+        finally:
+            remove_workspace_tempdir(tmpdir)
+
+
+class DfsRepeatFilterTests(TestCase):
+    def test_same_page_repeat_is_skipped_from_executed_task_history(self):
+        reason = _get_repeat_skip_reason(
+            task="点击底部导航栏的'我的淘宝'图标",
+            current_page_fp="pagefp",
+            executed_tasks_by_page={"pagefp": {"点击底部导航栏的'我的淘宝'图标"}},
+            path_level_repeat_history=[],
+        )
+
+        self.assertEqual(reason, "same_page")
+
+    def test_cross_page_navigation_repeat_is_skipped_from_path_history(self):
+        reason = _get_repeat_skip_reason(
+            task="点击底部导航栏的'我的淘宝'图标",
+            current_page_fp="pagefp-next",
+            executed_tasks_by_page={},
+            path_level_repeat_history=["点击底部导航栏的'我的淘宝'图标"],
+        )
+
+        self.assertEqual(reason, "path_navigation")
+
+    def test_cross_page_non_navigation_repeat_is_not_skipped(self):
+        reason = _get_repeat_skip_reason(
+            task="点击商品卡片'iPhone 15'",
+            current_page_fp="pagefp-next",
+            executed_tasks_by_page={},
+            path_level_repeat_history=["点击商品卡片'iPhone 15'"],
+        )
+
+        self.assertIsNone(reason)
+
+    def test_explore_dfs_skips_repeated_navigation_candidate_before_step_creation(self):
+        tmpdir = make_workspace_tempdir("dfs_repeat_skip")
+        try:
+            data_dir = tmpdir / "data"
+            steps_dir = data_dir / "steps"
+            paths_dir = data_dir / "paths"
+            partial_paths_dir = data_dir / "partial_paths"
+            ui_pages_dir = data_dir / "ui-pages"
+            steps_dir.mkdir(parents=True, exist_ok=True)
+            paths_dir.mkdir(parents=True, exist_ok=True)
+            partial_paths_dir.mkdir(parents=True, exist_ok=True)
+            ui_pages_dir.mkdir(parents=True, exist_ok=True)
+
+            runtime = SimpleNamespace(
+                metrics=_Metrics(),
+                features=SimpleNamespace(
+                    popup_auto_dismiss=False,
+                    already_explored_filter=True,
+                    explorer_cache=False,
+                    candidate_dedup=False,
+                    screen_cache=False,
+                    concurrent_fingerprint=False,
+                    hierarchy_text_decider=False,
+                    async_artifact_io=False,
+                    replay_recovery=False,
+                    triple_verify=False,
+                ),
+            )
+            fake_device = mock.Mock()
+            fake_device.start_app = mock.Mock()
+
+            path_actions = [
+                {
+                    "action_index": 1,
+                    "source_task": "点击底部导航栏的'我的淘宝'图标",
+                    "type": "click",
+                }
+            ]
+            path_reacts = [{"action_index": 1}]
+
+            with mock.patch(
+                "auto_explore.core.dfs._capture_screen",
+                return_value=("img-b64", "<root><node text='my taobao'/></root>"),
+            ), mock.patch(
+                "auto_explore.core.dfs.call_explorer_model",
+                return_value=(
+                    [{"rank": 1, "single_step_task": "点击底部导航栏的'我的淘宝'图标", "reason": "same tab"}],
+                    None,
+                ),
+            ), mock.patch(
+                "auto_explore.core.dfs.compute_fingerprints",
+                return_value=("pagefp", "structfp", "dhash"),
+            ), mock.patch(
+                "auto_explore.core.dfs._filter_repeated_candidates",
+                side_effect=lambda candidates, **_kwargs: candidates,
+            ), mock.patch(
+                "auto_explore.core.dfs.execute_decider_one_step"
+            ) as mocked_execute, mock.patch(
+                "auto_explore.core.dfs.get_hierarchy_text", return_value="<root><node text='my taobao'/></root>"
+            ), mock.patch(
+                "auto_explore.core.dfs.get_screenshot", return_value=""
+            ), mock.patch(
+                "auto_explore.core.dfs._persist_step_output_safe"
+            ), mock.patch(
+                "auto_explore.core.dfs.perform_backtrack_action"
+            ), mock.patch(
+                "auto_explore.core.dfs._is_app_in_foreground", return_value=True
+            ), mock.patch(
+                "auto_explore.core.dfs._simple_verify", return_value=True
+            ), mock.patch(
+                "auto_explore.core.dfs.copy_step_artifacts_to_path"
+            ), mock.patch(
+                "auto_explore.core.dfs._persist_outputs_safe"
+            ):
+                step_counter = [0]
+                explore_dfs(
+                    app_name="DemoApp",
+                    depth_limit=2,
+                    breadth=1,
+                    current_depth=0,
+                    decider_client=object(),
+                    decider_model="decider",
+                    explorer_client=object(),
+                    explorer_model="explorer",
+                    device=fake_device,
+                    device_type="Android",
+                    use_qwen3=False,
+                    allow_hierarchy_text_decider=False,
+                    data_dir=str(data_dir),
+                    actions=[],
+                    reacts=[],
+                    step_counter=step_counter,
+                    path_counter=[0],
+                    partial_path_counter=[0],
+                    page_counter=[0],
+                    steps_dir=str(steps_dir),
+                    paths_dir=str(paths_dir),
+                    partial_paths_dir=str(partial_paths_dir),
+                    enable_ui_semantic_collect=False,
+                    ui_pages_dir=str(ui_pages_dir),
+                    page_registry={},
+                    collect_queue=None,
+                    queue_lock=None,
+                    index_lock=None,
+                    index_path=None,
+                    ui_collect_async=False,
+                    ui_collect_queue_size=0,
+                    runtime=runtime,
+                    path_actions=path_actions,
+                    path_reacts=path_reacts,
+                    visited_tasks={},
+                    explorer_cache=None,
+                    screen_cache=None,
+                    popup_dismiss_max_attempts=0,
+                )
+
+            mocked_execute.assert_not_called()
+            self.assertEqual(step_counter[0], 0)
+            self.assertEqual(list(steps_dir.iterdir()), [])
         finally:
             remove_workspace_tempdir(tmpdir)
 

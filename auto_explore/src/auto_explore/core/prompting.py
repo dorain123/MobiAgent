@@ -39,6 +39,13 @@ def build_explorer_prompt(
     if already_explored:
         items = "\n".join(f"- {t}" for t in already_explored)
         already_explored_text = f"\n已在当前页面完成探索的操作（请勿重复生成）:\n{items}\n"
+    repeat_guard_text = """
+Additional hard constraints:
+- Do not repeat a task that is already completed in the action history.
+- Do not repeat a task that is already listed as explored on the current page.
+- If a navigation/tab/icon entry is already selected, or the target page is already reached, propose the next unexplored action on the current page instead of repeating the same navigation task.
+- Do not output a bottom navigation/tab switching task if it only returns to the page the user is already on.
+""".strip()
     return f"""
 你是移动端GUI探索助手。请结合截图、层级信息以及已发生的交互动作序列，输出当前界面"最有可能被用户下一步操作"的前{breadth}个单步任务，优先选择左侧、顶部或者底部的导航栏中的元素，并尽可能保证前后动作的连贯性。尽量不选择返回按钮和重复的动作。如果只剩下返回按钮，则终止这条收集。
 
@@ -70,6 +77,7 @@ def build_explorer_prompt(
 当前探索深度: {depth}
 当前路径动作序列(按时间顺序，最多展示20条):
 {history_text}
+{repeat_guard_text}
 """.strip()
 
 

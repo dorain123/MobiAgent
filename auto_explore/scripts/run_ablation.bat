@@ -25,9 +25,13 @@ if not defined SJTU_API_KEY (
 set "DECIDER_API_KEY=mobiagent-key"
 
 rem Explorer configuration.
-set "EXPLORER_MODEL=qwen3vl"
-set "OPENROUTER_BASE_URL=https://models.sjtu.edu.cn/api/v1"
-set "OPENROUTER_API_KEY=%SJTU_API_KEY%"
+rem set "EXPLORER_MODEL=qwen3vl"
+rem set "OPENROUTER_BASE_URL=https://models.sjtu.edu.cn/api/v1"
+rem set "OPENROUTER_API_KEY=%SJTU_API_KEY%"
+set "EXPLORER_MODEL=Qwen3.5-35B-A3B"
+set "OPENROUTER_BASE_URL=http://166.111.53.96:7002/v1"
+set "OPENROUTER_API_KEY=mobiagent-key"
+set "EXPLORER_DISABLE_THINKING=on"
 
 rem Runtime options.
 set "USE_QWEN3=on"
@@ -51,8 +55,8 @@ set "UI_COLLECT_DRAIN_TIMEOUT_SEC=180"
 set "UI_COLLECT_USE_VLM=on"
 set "UI_COLLECT_VLM_TEXT_ONLY=off"
 set "UI_COLLECT_VLM_MODEL=qwen/qwen3-vl-30b-a3b-instruct"
-set "UI_COLLECT_BASE_URL=%OPENROUTER_BASE_URL%"
-set "UI_COLLECT_API_KEY=%OPENROUTER_API_KEY%"
+set "UI_COLLECT_BASE_URL=https://models.sjtu.edu.cn/api/v1"
+set "UI_COLLECT_API_KEY=%SJTU_API_KEY%"
 set "UI_COLLECT_MAX_ITEMS=32"
 set "UI_COLLECT_MAX_VLM_CALLS=12"
 set "UI_COLLECT_MIN_AREA=16"
@@ -107,6 +111,7 @@ set CMD="%PYTHON_EXE%" -m auto_explore.cli.ablation_runner ^
  --openrouter_base_url "%OPENROUTER_BASE_URL%" ^
  --openrouter_api_key "%OPENROUTER_API_KEY%" ^
  --explorer_model "%EXPLORER_MODEL%" ^
+ --explorer_disable_thinking "%EXPLORER_DISABLE_THINKING%" ^
  --use_qwen3 "%USE_QWEN3%" ^
  --allow_hierarchy_text_decider "%ALLOW_HIERARCHY_TEXT_DECIDER%" ^
  --enable_ui_semantic_collect "%ENABLE_UI_SEMANTIC_COLLECT%" ^

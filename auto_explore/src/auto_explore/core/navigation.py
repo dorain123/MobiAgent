@@ -329,6 +329,134 @@ def replay_action_record(device, action_record: Dict[str, Any]) -> bool:
     return False
 
 
+def _task_looks_like_tab_switch(task_text: str) -> bool:
+    text = str(task_text or "").lower()
+    keywords = (
+        "tab",
+        "navigation",
+        "nav",
+        "bottom",
+        "top",
+        "switch",
+        "icon",
+        "\u5bfc\u822a",
+        "\u5bfc\u822a\u680f",
+        "\u6807\u7b7e",
+        "\u5207\u6362",
+        "\u56fe\u6807",
+        "\u5e95\u90e8",
+        "\u9876\u90e8",
+    )
+    return any(keyword in text for keyword in keywords)
+
+
+def _parse_bounds_value(value: Any) -> Optional[List[int]]:
+    if isinstance(value, (list, tuple)) and len(value) == 4:
+        try:
+            return [int(v) for v in value]
+        except Exception:
+            return None
+    if isinstance(value, str) and parse_bounds:
+        return parse_bounds(value)
+    return None
+
+
+def _selected_snapshot_from_attrs(attrs: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    selected = str(attrs.get("selected", "false")).lower() in {"true", "1"}
+    if not selected:
+        return None
+    bounds = _parse_bounds_value(attrs.get("bounds") or attrs.get("rect"))
+    if not bounds:
+        return None
+    text = str(attrs.get("text", attrs.get("label", attrs.get("content", ""))) or "").strip()
+    desc = str(attrs.get("content-desc", attrs.get("contentDescription", "")) or "").strip()
+    res_id = str(attrs.get("resource-id", attrs.get("id", "")) or "").strip()
+    cls = str(attrs.get("class", attrs.get("className", "")) or "").strip()
+    return {
+        "text": text,
+        "content_desc": desc,
+        "resource_id": res_id,
+        "class": cls,
+        "bounds": bounds,
+        "center_x": (bounds[0] + bounds[2]) // 2,
+        "center_y": (bounds[1] + bounds[3]) // 2,
+    }
+
+
+def _extract_selected_tab_snapshots(hierarchy_text: str) -> List[Dict[str, Any]]:
+    if not hierarchy_text:
+        return []
+    result: List[Dict[str, Any]] = []
+    if hierarchy_text.lstrip().startswith("<"):
+        try:
+            root = ET.fromstring(hierarchy_text)
+        except Exception:
+            return result
+        for node in root.iter():
+            snapshot = _selected_snapshot_from_attrs(dict(node.attrib))
+            if snapshot:
+                result.append(snapshot)
+        return result
+
+    try:
+        obj = json.loads(hierarchy_text)
+    except Exception:
+        return result
+
+    def _walk(node: Any) -> None:
+        if isinstance(node, dict):
+            attrs = node.get("attributes") if isinstance(node.get("attributes"), dict) else node
+            if isinstance(attrs, dict):
+                snapshot = _selected_snapshot_from_attrs(attrs)
+                if snapshot:
+                    result.append(snapshot)
+            for value in node.values():
+                _walk(value)
+        elif isinstance(node, list):
+            for item in node:
+                _walk(item)
+
+    _walk(obj)
+    return result
+
+
+def _extract_selected_bounds(hierarchy_text: str) -> List[List[int]]:
+    return [snapshot["bounds"] for snapshot in _extract_selected_tab_snapshots(hierarchy_text)]
+
+
+def _choose_tab_snapshot_for_action(
+    snapshots: List[Dict[str, Any]],
+    action_record: Optional[Dict[str, Any]],
+) -> Optional[Dict[str, Any]]:
+    if not snapshots:
+        return None
+    if not action_record:
+        return snapshots[0]
+
+    bounds = action_record.get("bounds")
+    def _rank(item: Dict[str, Any], target_y: int) -> tuple:
+        label = str(item.get("text") or item.get("content_desc") or "")
+        b = item.get("bounds", [0, 0, 0, 0])
+        area = max(1, (int(b[2]) - int(b[0])) * (int(b[3]) - int(b[1]))) if len(b) == 4 else 1
+        return (abs(int(item.get("center_y", 0)) - target_y), 0 if label else 1, area)
+
+    if isinstance(bounds, (list, tuple)) and len(bounds) == 4:
+        try:
+            target_y = (int(bounds[1]) + int(bounds[3])) // 2
+            return min(snapshots, key=lambda item: _rank(item, target_y))
+        except Exception:
+            pass
+
+    pos_y = action_record.get("position_y")
+    if pos_y is not None:
+        try:
+            return min(snapshots, key=lambda item: _rank(item, int(pos_y)))
+        except Exception:
+            pass
+
+    return min(snapshots, key=lambda item: max(1, (item["bounds"][2] - item["bounds"][0]) * (item["bounds"][3] - item["bounds"][1])))
+
+
 def perform_backtrack_action(device, device_type: str, action_record: Optional[Dict[str, Any]]) -> None:
     if not action_record:
         navigate_back(device, device_type)
@@ -357,6 +485,57 @@ def perform_backtrack_action(device, device_type: str, action_record: Optional[D
     navigate_back(device, device_type)
 
 
+def semantic_backtrack_action(
+    device,
+    device_type: str,
+    action_record: Optional[Dict[str, Any]],
+    pre_hierarchy_text: str = "",
+) -> str:
+    """Try semantic recovery first; return the strategy that was attempted."""
+    if not action_record:
+        navigate_back(device, device_type)
+        return "back_no_action"
+
+    action_type = str(action_record.get("type", "")).lower()
+    task_text = str(action_record.get("source_task", ""))
+
+    if action_type in {"click_input", "input"}:
+        navigate_back(device, device_type)
+        return "input_back"
+
+    if action_type == "swipe":
+        perform_backtrack_action(device, device_type, action_record)
+        return "reverse_swipe"
+
+    if action_type == "click" and _task_looks_like_tab_switch(task_text):
+        recorded_snapshot = action_record.get("pre_selected_tab") if isinstance(action_record, dict) else None
+        snapshots = []
+        if isinstance(recorded_snapshot, dict) and isinstance(recorded_snapshot.get("bounds"), list):
+            snapshots.append(recorded_snapshot)
+        snapshots.extend(_extract_selected_tab_snapshots(pre_hierarchy_text))
+        selected_snapshot = _choose_tab_snapshot_for_action(snapshots, action_record)
+        if selected_snapshot:
+            best = selected_snapshot["bounds"]
+            x = int(selected_snapshot.get("center_x", (best[0] + best[2]) // 2))
+            y = int(selected_snapshot.get("center_y", (best[1] + best[3]) // 2))
+            label = selected_snapshot.get("text") or selected_snapshot.get("content_desc") or ""
+            try:
+                device.click(x, y)
+                time.sleep(settings.DEVICE_WAIT_TIME)
+                logging.info(
+                    "Semantic backtrack: clicked previous selected tab at (%d,%d), label=%s.",
+                    x,
+                    y,
+                    label,
+                )
+                return "semantic_tab"
+            except Exception as exc:
+                logging.warning("Semantic tab backtrack failed: %s", exc)
+
+    navigate_back(device, device_type)
+    return "back"
+
+
 __all__ = [
     "_extract_foreground_from_hierarchy",
     "_find_dismissible_element",
@@ -366,7 +545,10 @@ __all__ = [
     "_is_app_in_foreground",
     "_reverse_direction",
     "_task_mentions_swipe",
+    "_extract_selected_tab_snapshots",
+    "_choose_tab_snapshot_for_action",
     "navigate_back",
     "perform_backtrack_action",
     "replay_action_record",
+    "semantic_backtrack_action",
 ]

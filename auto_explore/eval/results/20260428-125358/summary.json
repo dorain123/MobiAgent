@@ -1,0 +1,1909 @@
+{
+  "input_path": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001",
+  "target_level": "auto",
+  "judge_model": "Qwen3.5-35B-A3B",
+  "judge_base_url": "http://166.111.53.96:7002/v1",
+  "judge_mode": "legacy_text",
+  "evaluated_at": "2026-04-28T12:53:58",
+  "sample_count": 55,
+  "success_count": 55,
+  "error_count": 0,
+  "averages": {
+    "trajectory_completeness_score": 9.964,
+    "reasoning_quality_score": 6.582,
+    "overall_score": 8.509
+  },
+  "samples": [
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Fully executes all 6 task steps",
+        "Perfect alignment between actions and reasoning",
+        "Correctly terminates with success status"
+      ],
+      "issues": [
+        "Reasoning is repetitive and lacks depth",
+        "No explanation of UI state changes or context"
+      ],
+      "summary": "The trace successfully completes the 6-step Taobao navigation task with perfect alignment between actions and the plan. It terminates correctly with a success status. However, the reasoning quality is limited by repetitive, generic explanations that do not describe UI state changes or contextual logic.",
+      "overall_score": 9,
+      "sample_id": "path_0001",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0001",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击“查看详情”按钮; Step 6: 点击顶部导航栏的“菜鸟”图标",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:33:48",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 8,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Executed all 6 required task steps correctly",
+        "Properly terminated with 'done' status",
+        "Action coordinates reflect UI state changes (bottom to top nav)"
+      ],
+      "issues": [
+        "Reasoning is repetitive and templated across steps",
+        "Lacks description of UI state transitions between steps"
+      ],
+      "summary": "The agent successfully completed all 6 required navigation steps and terminated correctly. The trajectory is fully coherent and aligned with the task description, though the reasoning provided is generic and does not elaborate on UI context changes.",
+      "overall_score": 9,
+      "sample_id": "path_0002",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0002",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击顶部“售后”标签; Step 6: 点击顶部导航栏的“提醒”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:34:26",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Successfully executes all 6 required steps in the task description.",
+        "Correctly identifies target elements via text matching and hierarchy.",
+        "Properly concludes with a 'done' action and success status."
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched') without describing UI state changes.",
+        "Lacks explanation of why specific elements are visible after navigation steps.",
+        "Does not validate if the target element remains accessible after previous clicks."
+      ],
+      "summary": "The trajectory perfectly follows the task instructions, executing all six navigation steps and concluding successfully. The action selection is accurate and aligned with the goal. However, the reasoning quality is limited by its repetitive, formulaic nature, which fails to contextualize the UI state transitions between steps, relying solely on text matching without acknowledging screen changes.",
+      "overall_score": 8,
+      "sample_id": "path_0003",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0003",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击顶部“售后”标签; Step 6: 点击顶部导航栏的“互动”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:34:46",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Executed all 6 task steps exactly as specified in the description",
+        "Properly terminated with a success status and done action",
+        "Action types consistently match the required interactions (click)"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic, relying solely on 'Hierarchy text matched'",
+        "Lacks context about UI state changes or navigation flow between steps",
+        "Does not verify element visibility or clickability beyond text matching"
+      ],
+      "summary": "The trajectory successfully completes all 6 specified steps and terminates with a success status, demonstrating perfect goal coverage and step coherence. However, the reasoning quality is limited by a repetitive template that confirms text matching without explaining the UI context or navigation logic required to transition between tabs.",
+      "overall_score": 8,
+      "sample_id": "path_0004",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0004",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击顶部“售后”标签; Step 6: 点击顶部导航栏的“赞评”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:35:14",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 8,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Perfectly executed all 6 required steps in the task description.",
+        "Correctly terminated with a 'done' action and success status.",
+        "Action sequence is logically coherent and matches the instructions."
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched') without UI context.",
+        "Does not explicitly confirm visual location (e.g., bottom nav) in reasoning text."
+      ],
+      "summary": "The agent successfully completed the multi-step navigation task in Taobao, executing all 6 clicks exactly as specified and terminating correctly. The trajectory is fully complete and coherent. However, the reasoning quality is moderate as it relies on generic text-matching statements rather than describing the UI state or visual context for each action.",
+      "overall_score": 9,
+      "sample_id": "path_0005",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0005",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击顶部“提醒”标签; Step 6: 点击顶部导航栏的“互动”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:35:27",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 9,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executed all 6 specified navigation steps in order",
+        "Correctly terminated with a success status after completing the task"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched') across all steps",
+        "Lacks description of UI state changes or navigation context between steps"
+      ],
+      "summary": "The trajectory perfectly completes the defined 6-step Taobao navigation task with a success status. However, the reasoning quality is limited as it relies on a static template ('Hierarchy text matched') without explaining the UI context or navigation logic between steps.",
+      "overall_score": 8,
+      "sample_id": "path_0006",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0006",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击顶部“提醒”标签; Step 6: 点击顶部导航栏的“赞评”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:35:52",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 8,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Perfectly executes all 6 steps defined in the task description",
+        "Ends with a clear 'done' action and success status",
+        "Reasoning is consistent and correctly identifies target elements"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched')",
+        "Lacks contextual description of UI state or element location"
+      ],
+      "summary": "The trace successfully completes the Taobao navigation task by executing all 6 specified steps and terminating with a success status. The reasoning is consistent and accurately maps actions to target elements via hierarchy text matching. However, the reasoning quality is limited by its repetitive and generic nature, lacking descriptive context about the UI environment or state changes between steps.",
+      "overall_score": 9,
+      "sample_id": "path_0007",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0007",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击顶部“提醒”标签; Step 6: 点击顶部导航栏的“优惠”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:36:08",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Perfectly executes all 6 task steps as defined in the description",
+        "Clear termination with 'done' status and success confirmation",
+        "Precise element targeting with valid bounds and positions"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic across all steps",
+        "Lacks context about UI state transitions or page navigation logic",
+        "Does not explain why specific elements were chosen beyond text matching"
+      ],
+      "summary": "The trajectory successfully completes the entire 6-step task sequence and terminates with a success status, demonstrating perfect goal coverage and step coherence. Action targets align precisely with the task requirements. However, the reasoning quality is limited by its repetitive nature, which relies solely on hierarchy text matching without providing contextual justification or describing UI state changes between steps.",
+      "overall_score": 8,
+      "sample_id": "path_0008",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0008",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“售后”标签; Step 5: 点击顶部导航栏的“物流”标签; Step 6: 点击“查看详情”按钮",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:36:33",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Successfully executed all 6 defined task steps",
+        "Correctly terminated with 'done' status",
+        "Actions align perfectly with target elements"
+      ],
+      "issues": [
+        "Reasoning is repetitive and lacks contextual depth",
+        "Does not describe UI state changes between steps",
+        "Generic reasoning template used for all steps"
+      ],
+      "summary": "The trajectory perfectly completes the defined 6-step task and terminates correctly. While action-reason alignment is flawless, the reasoning quality is limited by its repetitive, template-like nature that fails to describe the evolving UI state or context beyond simple text matching.",
+      "overall_score": 9,
+      "sample_id": "path_0009",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0009",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“售后”标签; Step 5: 点击顶部导航栏的“物流”标签; Step 6: 点击顶部“提醒”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:36:56",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Executes all 6 required navigation steps accurately",
+        "Ends with a clear success status",
+        "Action targets match reasoning descriptions precisely"
+      ],
+      "issues": [
+        "Reasoning is overly generic across all steps",
+        "Lacks explanation of UI state transitions"
+      ],
+      "summary": "The trajectory perfectly fulfills the task requirements by executing all six navigation steps in the Taobao app and concluding with a success status. Action-reason alignment is flawless, though the reasoning quality is diminished by repetitive, shallow justifications that rely solely on text matching without contextual analysis.",
+      "overall_score": 9,
+      "sample_id": "path_0010",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0010",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“售后”标签; Step 5: 点击顶部导航栏的“优惠”标签; Step 6: 点击顶部导航栏的“其他”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:37:17",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Executed all 6 task steps exactly as specified in the description",
+        "Proper termination with 'done' status and success flag",
+        "Consistent action-reason alignment across all steps"
+      ],
+      "issues": [
+        "Reasoning is repetitive and lacks contextual depth beyond text matching",
+        "No explanation of UI state changes or navigation context between steps"
+      ],
+      "summary": "The trace successfully completes the defined navigation task within Taobao, executing all six steps and terminating correctly. While goal coverage and alignment are flawless, the reasoning quality is limited by generic text-matching explanations that do not describe UI context or state transitions.",
+      "overall_score": 9,
+      "sample_id": "path_0011",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0011",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“售后”标签; Step 5: 点击顶部导航栏的“优惠”标签; Step 6: 点击顶部导航栏的“互动”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:37:35",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Perfectly executes all 6 task steps as defined in the description",
+        "Correctly terminates with a 'done' action and success status",
+        "Action targets align precisely with the specified UI elements"
+      ],
+      "issues": [
+        "Reasoning is overly repetitive and lacks contextual depth (e.g., state changes)",
+        "Reasoning relies solely on text matching without describing UI layout or navigation logic"
+      ],
+      "summary": "The trajectory successfully completes the entire task sequence within the Taobao app, executing all six navigation steps and terminating correctly. The actions are perfectly aligned with the task goals and UI elements, demonstrating high coherence and coverage. However, the reasoning quality is limited by its repetitive, formulaic nature, which identifies targets by text matching without explaining the navigation context or state transitions between steps.",
+      "overall_score": 9,
+      "sample_id": "path_0012",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0012",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“售后”标签; Step 5: 点击顶部导航栏的“优惠”标签; Step 6: 点击顶部导航栏的“提醒”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:37:56",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Perfectly executes all 6 required task steps in order",
+        "Clear termination with success status"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic across all steps",
+        "Lacks description of UI context or navigation flow"
+      ],
+      "summary": "The trajectory successfully completes the defined 6-step task path and terminates correctly. While the actions align perfectly with the goal, the reasoning is overly template-like, relying solely on text matching without providing context about the UI state or navigation logic.",
+      "overall_score": 9,
+      "sample_id": "path_0013",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0013",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“售后”标签; Step 5: 点击顶部导航栏的“其他”标签; Step 6: 点击顶部导航栏的“提醒”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:38:21",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 9,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Executed all 6 task steps exactly as described",
+        "Clear termination with success status",
+        "Perfect alignment between actions and task instructions"
+      ],
+      "issues": [
+        "Reasoning is repetitive and lacks contextual depth",
+        "Does not explain UI state transitions or logic"
+      ],
+      "summary": "The trace successfully completes the 6-step navigation task with perfect adherence to instructions and a clear success conclusion. While goal coverage and action alignment are flawless, the reasoning quality is limited by its generic, repetitive nature that confirms text matching without providing meaningful context for the navigation flow.",
+      "overall_score": 9,
+      "sample_id": "path_0014",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0014",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“售后”标签; Step 5: 点击顶部导航栏的“其他”标签; Step 6: 点击顶部导航栏的“互动”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:38:46",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 9,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Perfectly executes all 6 task steps",
+        "Clear success termination",
+        "Consistent action-reason mapping"
+      ],
+      "issues": [
+        "Reasoning is formulaic and lacks context",
+        "No verification of UI state changes"
+      ],
+      "summary": "The trajectory successfully completes the specified Taobao navigation task with precise action alignment. However, the reasoning is overly mechanical, relying on simple text matching without explaining UI context or verifying navigation results.",
+      "overall_score": 9,
+      "sample_id": "path_0015",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0015",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“售后”标签; Step 5: 点击顶部导航栏的“其他”标签; Step 6: 点击顶部导航栏的“赞评”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:39:11",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 9,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Strictly follows all 6 task steps in order",
+        "Clear termination with success status and summary"
+      ],
+      "issues": [
+        "Reasoning is repetitive and lacks contextual depth",
+        "Does not explain UI state changes between steps"
+      ],
+      "summary": "The trace successfully executes all 6 specified navigation steps in the Taobao app and concludes with a success status, demonstrating perfect goal coverage and action alignment. However, the reasoning quality is moderate as it relies on a repetitive 'text matched' explanation without providing context on UI state transitions or navigation logic.",
+      "overall_score": 9,
+      "sample_id": "path_0016",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0016",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“互动”标签; Step 5: 点击顶部导航栏的“物流”标签; Step 6: 点击顶部导航栏的“售后”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:39:38",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 8,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Perfectly executes all 6 required task steps",
+        "Clear success termination with done action",
+        "Consistent action-target mapping across all steps"
+      ],
+      "issues": [
+        "Reasoning is formulaic and lacks context about UI state transitions",
+        "No explanation of navigation logic between bottom tabs"
+      ],
+      "summary": "The trajectory successfully completes the 6-step Taobao navigation task with a final success status. Every action aligns precisely with the task description, and the reasoning consistently identifies targets via text matching. However, the reasoning is repetitive and does not elaborate on the UI context or state changes between steps, relying solely on element identification.",
+      "overall_score": 9,
+      "sample_id": "path_0017",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0017",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“互动”标签; Step 5: 点击顶部导航栏的“物流”标签; Step 6: 点击顶部导航栏的“赞评”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:39:57",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Perfectly executes all 6 specified task steps",
+        "Clear termination with success status and summary",
+        "Consistent action selection matching target elements"
+      ],
+      "issues": [
+        "Intermediate reasoning is repetitive and lacks contextual depth",
+        "No description of UI state changes or navigation logic between steps"
+      ],
+      "summary": "The trajectory successfully completes the entire task sequence with correct actions and a proper success termination. However, the reasoning quality is limited as intermediate steps rely on generic text-matching logs rather than explaining the navigation context or UI state transitions, making the decision process less interpretable.",
+      "overall_score": 8,
+      "sample_id": "path_0018",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0018",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击顶部“服务提醒”卡片; Step 4: 点击顶部导航栏的“互动”标签; Step 5: 点击顶部导航栏的“售后”标签; Step 6: 点击顶部导航栏的“设置”图标",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:40:21",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 6
+      },
+      "strengths": [
+        "Successfully completed all 6 defined task steps",
+        "Action sequence strictly follows the task description",
+        "Correctly identified target elements by text matching"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched')",
+        "Lacks description of UI state or context changes between steps",
+        "Does not explain visual justification for element selection"
+      ],
+      "summary": "The trajectory successfully executes all 6 steps of the Taobao task and terminates with a success status. However, the reasoning quality is limited as it relies on a repetitive template without describing the visual context or UI state transitions, making it difficult to verify the agent's actual understanding of the screen beyond text matching.",
+      "overall_score": 8,
+      "sample_id": "path_0019",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0019",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“修改地址”按钮; Step 5: 点击底部按钮“联系商家”; Step 6: 点击底部导航栏的“自助服务”按钮",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:40:50",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 5,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "All 6 task steps executed successfully in correct order",
+        "Clear success termination status at the end",
+        "Action sequence perfectly aligns with task description"
+      ],
+      "issues": [
+        "Reasoning is repetitive and template-like across all steps",
+        "Lacks context on UI state transitions or navigation results",
+        "No verification of whether previous actions led to expected screens"
+      ],
+      "summary": "The trajectory successfully completes all 6 defined steps of the Taobao navigation task and terminates with a success status. The sequence is logically coherent and perfectly aligns with the task description. However, the reasoning quality is low as it relies on a generic 'Hierarchy text matched' template without explaining UI context or state changes between steps.",
+      "overall_score": 8,
+      "sample_id": "path_0020",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0020",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“修改地址”按钮; Step 5: 点击底部按钮“联系商家”; Step 6: 点击底部导航栏的“店铺明星单品”按钮",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:41:21",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executed all 6 required navigation steps",
+        "Properly terminated with 'done' status and success confirmation",
+        "Action targets match task description exactly"
+      ],
+      "issues": [
+        "Reasoning is repetitive and template-based across steps",
+        "Lacks contextual explanation of UI state changes or decision logic"
+      ],
+      "summary": "The trajectory perfectly completes the specified Taobao navigation task with correct action targets and termination. However, the reasoning quality is limited by its repetitive, formulaic nature ('Hierarchy text matched'), which fails to provide meaningful context or justification for the actions beyond simple text recognition.",
+      "overall_score": 9,
+      "sample_id": "path_0021",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0021",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“修改地址”按钮; Step 5: 点击底部按钮“返回”; Step 6: 点击顶部“物流”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:41:45",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executes all 6 task steps in the correct order",
+        "Concludes with a clear success status",
+        "Action targets match the task description exactly"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic across all steps",
+        "Lacks description of UI state changes or visual context",
+        "Does not explain why specific elements were chosen beyond text matching"
+      ],
+      "summary": "The trajectory perfectly completes the defined task sequence in the Taobao app, executing all 6 required actions and ending with a success status. While the goal coverage and step coherence are excellent, the reasoning quality is limited by its repetitive nature, relying solely on 'Hierarchy text matched' without providing contextual justification or describing the UI state transitions between steps.",
+      "overall_score": 8,
+      "sample_id": "path_0022",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0022",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“修改地址”按钮; Step 5: 点击底部按钮“返回”; Step 6: 点击顶部“售后”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:42:11",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 8,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Successfully executed all 6 required task steps in correct order",
+        "Precise target element selection matching task description exactly",
+        "Clear termination with 'done' status confirming completion"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched')",
+        "Lacks description of UI state changes or context between steps"
+      ],
+      "summary": "The trajectory perfectly follows the task instructions, executing all six navigation and interaction steps in the correct order. Action-target alignment is exact, and the task concludes successfully. However, the reasoning provided for each step is minimal and formulaic, focusing only on text matching without contextualizing the UI state or navigation flow.",
+      "overall_score": 9,
+      "sample_id": "path_0023",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0023",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击底部导航栏的“我的”图标; Step 2: 点击底部导航栏的“消息”图标; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“修改地址”按钮; Step 5: 点击底部按钮“返回”; Step 6: 点击“小米官方旗舰店”消息条目",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:42:31",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Executes all 6 task steps sequentially as defined in the instructions.",
+        "Properly terminates with a 'done' action indicating success.",
+        "Target elements and coordinates are specific and consistent with the task."
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched'), lacking semantic context.",
+        "Does not explain the intent behind navigation changes or UI state transitions."
+      ],
+      "summary": "The trace successfully completes all specified steps in the task description, ending with a success status. The action sequence is coherent and aligns perfectly with the instructions. However, the reasoning provided for each step is minimal and formulaic, merely confirming text matches without explaining the user intent or UI context.",
+      "overall_score": 9,
+      "sample_id": "path_0024",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0024",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“物流”标签; Step 4: 点击“查看详情”按钮; Step 5: 点击“打电话”按钮联系快递员; Step 6: 点击“查看更多物流明细”",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:42:53",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executed all 6 required navigation steps",
+        "Correct sequence matching the task description",
+        "Clear termination with success status"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched')",
+        "Lacks visual context description (e.g., top/bottom location)"
+      ],
+      "summary": "The trajectory fully completes the task by executing all six navigation steps in the correct order and ending with a success status. The sequence is coherent and actions align perfectly with the plan. However, the reasoning quality is moderate as it relies on a generic text-matching justification without describing the visual UI state or element location, limiting its explanatory depth.",
+      "overall_score": 9,
+      "sample_id": "path_0025",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0025",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“物流”标签; Step 4: 点击顶部“提醒”标签; Step 5: 点击顶部导航栏的“其他”标签; Step 6: 点击顶部导航栏的“优惠”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:43:14",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 8,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "All 6 task steps executed in the correct order",
+        "Proper termination with 'done' status",
+        "Action coordinates align with task spatial requirements (top vs bottom)"
+      ],
+      "issues": [
+        "Reasoning text is repetitive and lacks UI context description",
+        "Does not explicitly mention navigation bar location in reasoning text"
+      ],
+      "summary": "The agent successfully executed all 6 navigation steps in the correct sequence and terminated properly. The action coordinates align well with the task's spatial requirements (top vs bottom), indicating good grounding, though the textual reasoning is minimal and repetitive.",
+      "overall_score": 9,
+      "sample_id": "path_0026",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0026",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“物流”标签; Step 4: 点击顶部“提醒”标签; Step 5: 点击顶部导航栏的“其他”标签; Step 6: 点击顶部导航栏的“售后”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:43:33",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 8,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Successfully executed all 6 required interaction steps",
+        "Clear termination with 'done' status and success confirmation",
+        "Actions consistently match the specified target elements"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic for steps 1-5 (only mentions text match)",
+        "Lacks explicit verification of UI state changes between navigation steps"
+      ],
+      "summary": "The trace fully completes the defined task sequence, executing all six navigation and interaction steps before terminating with a success status. The reasoning is logically consistent and accurately identifies target elements via text matching, though it remains somewhat generic and does not elaborate on the UI context or state transitions between steps.",
+      "overall_score": 9,
+      "sample_id": "path_0027",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0027",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“物流”标签; Step 4: 点击顶部“提醒”标签; Step 5: 点击顶部导航栏的“其他”标签; Step 6: 点击右上角设置图标",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:43:45",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 8,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Successfully executes all 6 defined task steps",
+        "Actions precisely match the task instructions",
+        "Properly terminates with 'done' status"
+      ],
+      "issues": [
+        "Reasoning is repetitive and lacks context on UI state transitions",
+        "No explicit navigation actions shown despite implied screen changes"
+      ],
+      "summary": "The trajectory successfully completes all interaction steps defined in the task description, ending with a success status. Each action aligns perfectly with the instructions, and element identification via text matching is consistent. However, the reasoning is generic and does not explain the UI context or navigation logic between steps, such as returning to the home screen before accessing top navigation tabs.",
+      "overall_score": 9,
+      "sample_id": "path_0028",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0028",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“物流”标签; Step 4: 点击顶部“提醒”标签; Step 5: 点击第一条通知的“查看详情”按钮; Step 6: 点击“复制”按钮",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:44:05",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Executed all 6 required navigation steps exactly as specified",
+        "Correctly terminated with a success status and done action",
+        "Provided precise bounding box coordinates for each interaction"
+      ],
+      "issues": [
+        "Reasoning is repetitive and lacks contextual explanation for user intent",
+        "Does not describe UI state changes or transitions between steps"
+      ],
+      "summary": "The trace successfully completes the full sequence of navigation tasks within the Taobao app, ending with a proper success status. While the actions are perfectly aligned with the task requirements and grounded in specific UI coordinates, the reasoning provided is overly generic, relying on simple text matching without explaining the purpose or context of each interaction.",
+      "overall_score": 8,
+      "sample_id": "path_0029",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0029",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击顶部导航栏的“店铺”标签; Step 5: 点击底部导航栏的“宝贝”标签; Step 6: 点击顶部导航栏的“分类”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:44:34",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 5,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Successfully executed all 6 required task steps",
+        "Correctly terminated with done status",
+        "Action coordinates align with described UI locations (top/bottom nav)"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched')",
+        "Lacks contextual explanation for state changes or navigation logic",
+        "Final step reasoning is a direct copy of the task description"
+      ],
+      "summary": "The trajectory perfectly completes the defined task sequence with accurate step execution and proper termination. However, the reasoning quality is low, as it relies on static text-matching statements without explaining the UI context or decision logic behind the navigation flow.",
+      "overall_score": 8,
+      "sample_id": "path_0030",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0030",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击顶部导航栏的“店铺”标签; Step 5: 点击底部导航栏的“宝贝”标签; Step 6: 点击顶部导航栏的“新品”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:45:04",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Successfully executed all 6 required navigation steps.",
+        "Correctly identified and clicked target elements based on text.",
+        "Properly terminated the task with a 'done' status."
+      ],
+      "issues": [
+        "Reasoning is formulaic and repetitive across all steps.",
+        "Lacks explanation of UI state changes or navigation context.",
+        "Does not explicitly link actions to task goals beyond text matching."
+      ],
+      "summary": "The trace fully completes the Taobao navigation task with accurate element targeting and correct sequencing. However, the reasoning quality is limited by its generic nature, as it relies solely on text matching without describing the UI context or the logical flow between steps.",
+      "overall_score": 8,
+      "sample_id": "path_0031",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0031",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击顶部导航栏的“店铺”标签; Step 5: 点击底部导航栏的“直播”标签; Step 6: 点击底部导航栏的“首页”图标",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:45:26",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 5,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executes all 6 required navigation steps",
+        "Correctly terminates with a success status",
+        "Actions align perfectly with task instructions"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic across all steps",
+        "Lacks context about UI state changes or verification",
+        "Does not explain why specific elements were selected beyond text matching"
+      ],
+      "summary": "The trajectory successfully completes the full navigation task within the Taobao app, executing all six specified clicks and ending with a success status. However, the reasoning quality is limited as it relies on a repetitive template stating only that hierarchy text matched the target, without providing insight into UI state transitions or verification of the action's impact.",
+      "overall_score": 8,
+      "sample_id": "path_0032",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0032",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击顶部导航栏的“店铺”标签; Step 5: 点击底部导航栏的“直播”标签; Step 6: 点击底部导航栏的“宝贝”图标",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:45:48",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 9,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Executes all 6 required task steps in the correct order",
+        "Concludes with a clear success status",
+        "Action targets align precisely with task description"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic across steps 1-6",
+        "Lacks description of UI state changes or navigation context",
+        "Does not verify element visibility beyond text matching"
+      ],
+      "summary": "The trajectory successfully completes all specified steps in the correct order with a final success status, demonstrating perfect goal coverage and action alignment. However, the reasoning quality is limited by its repetitive nature, relying solely on text matching without providing context on UI state or navigation logic between steps.",
+      "overall_score": 9,
+      "sample_id": "path_0033",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0033",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“热销TOP榜单”链接; Step 5: 点击底部导航栏的“店铺明星单品”标签; Step 6: 点击底部导航栏的“加入购物车”按钮",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:46:15",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executed all 6 required task steps",
+        "Provided precise bounding box coordinates for each action",
+        "Correctly terminated with success status"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic, merely stating text match without UI context",
+        "Fails to describe navigation logic or state transitions between steps",
+        "Does not explicitly reference UI locations (e.g., bottom nav) as per task description"
+      ],
+      "summary": "The trajectory successfully completes the defined task with precise actions and correct termination. However, the reasoning quality is limited by its repetitive and generic nature, failing to describe the UI context or navigation logic between steps, which reduces the transparency of the agent's decision-making process.",
+      "overall_score": 8,
+      "sample_id": "path_0034",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0034",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“热销TOP榜单”链接; Step 5: 点击底部导航栏的“店铺明星单品”标签; Step 6: 点击底部导航栏的“领券购买”按钮",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:46:40",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 5,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 6
+      },
+      "strengths": [
+        "Successfully executes all 6 required navigation steps in the correct order.",
+        "Concludes with a clear 'done' action and success status.",
+        "Action targets match the task description text exactly."
+      ],
+      "issues": [
+        "Reasoning is highly repetitive and generic ('Hierarchy text matched...'), lacking UI context.",
+        "Trace length (7 steps) exceeds the configured depth limit (6).",
+        "No explanation of element location or state changes between steps."
+      ],
+      "summary": "The trace perfectly follows the defined navigation path, completing all 6 steps and terminating successfully. However, the reasoning quality is low due to repetitive, boilerplate text that confirms target matching without describing the UI context or state. Additionally, the total step count slightly exceeds the configured depth limit.",
+      "overall_score": 8,
+      "sample_id": "path_0035",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0035",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“热销TOP榜单”链接; Step 5: 点击底部导航栏的“店铺明星单品”标签; Step 6: 点击底部导航栏的“客服”图标",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:46:59",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Executes all 6 task steps in the exact order specified",
+        "Ends with a clear success status and completion reasoning",
+        "Action targets match the task description element names precisely"
+      ],
+      "issues": [
+        "Reasoning text is repetitive and generic across all steps",
+        "Lacks description of UI state changes or context between steps",
+        "Does not explain navigation logic (e.g., how Step 4 leads to Step 5)"
+      ],
+      "summary": "The trajectory successfully completes the defined task sequence with perfect alignment between instructions and actions, ending in a success state. While the execution is flawless and the element targets are correctly identified, the reasoning quality is limited by repetitive, boilerplate text that confirms text matching without providing meaningful context about the UI state or navigation flow.",
+      "overall_score": 9,
+      "sample_id": "path_0036",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0036",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“评价客服”按钮; Step 5: 点击底部导航栏的“店铺明星单品”标签; Step 6: 点击底部导航栏的“加入购物车”按钮",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:47:20",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Successfully completed all 6 required task steps",
+        "Correctly terminated with 'done' status and success flag",
+        "Action sequence strictly follows the task description order"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic across all steps",
+        "Fails to reference specific UI locations (e.g., bottom navigation) mentioned in task instructions"
+      ],
+      "summary": "The trace successfully executes the full 6-step Taobao task and terminates correctly with a success status. The action sequence is perfectly coherent and aligned with the goal. However, the reasoning quality is moderate because it relies on a repetitive 'Hierarchy text matched' pattern without incorporating the spatial context (top/bottom navigation) specified in the task description, making the reasoning less informative.",
+      "overall_score": 9,
+      "sample_id": "path_0037",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0037",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“评价客服”按钮; Step 5: 点击底部导航栏的“店铺明星单品”标签; Step 6: 点击底部导航栏的“领券购买”按钮",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:47:41",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executed all 6 required task steps",
+        "Actions strictly align with task instructions",
+        "Proper termination with success status"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic across all steps",
+        "Lacks description of UI state or context changes",
+        "No validation of element visibility beyond text matching"
+      ],
+      "summary": "The trace successfully completes the full Taobao task sequence, executing all 6 clicks and ending with a success status. The trajectory is complete and coherent with the task description. However, the reasoning quality is limited by its repetitive template-based format ('Hierarchy text matched'), which fails to provide meaningful context about the UI state or element interactivity.",
+      "overall_score": 8,
+      "sample_id": "path_0038",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0038",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“评价客服”按钮; Step 5: 点击底部导航栏的“店铺明星单品”标签; Step 6: 点击底部导航栏的“客服”图标",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:48:03",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Executes all 6 required task steps exactly as specified",
+        "Ends with explicit success status and done action",
+        "Provides precise bounding box coordinates indicating grounded UI interaction"
+      ],
+      "issues": [
+        "Reasoning text is repetitive and lacks contextual depth beyond text matching",
+        "Does not describe UI state changes or navigation context between steps"
+      ],
+      "summary": "The trace successfully completes the full 6-step navigation task within the Taobao app, executing each click and concluding with a success status. While the action sequence and grounding data are accurate and coherent, the reasoning text is overly generic, relying solely on text matching without explaining the interaction context or state transitions.",
+      "overall_score": 9,
+      "sample_id": "path_0039",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0039",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“评价客服”按钮; Step 5: 点击底部导航栏的“惊喜福袋”标签; Step 6: 点击底部导航栏的“自助服务”按钮",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:48:22",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executed all 6 required task steps",
+        "Correctly identified target elements via text matching",
+        "Properly concluded with a 'done' action and success status"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic across all steps",
+        "Lacks description of UI state transitions between actions",
+        "Does not explain context for why specific elements were targeted beyond text match"
+      ],
+      "summary": "The trace fully completes the 6-step Taobao task, executing each click action in the correct sequence and ending with a success status. While the actions are perfectly aligned with the goal and grounded in specific UI coordinates, the reasoning quality is limited by its repetitive, boilerplate nature which fails to describe the changing UI context or the logic behind each navigation step.",
+      "overall_score": 8,
+      "sample_id": "path_0040",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0040",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击“大英博物馆旗舰店”消息条目; Step 4: 点击“评价客服”按钮; Step 5: 点击底部导航栏的“惊喜福袋”标签; Step 6: 点击底部导航栏的“店铺明星单品”按钮",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:48:38",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Executes all 6 task steps in the correct order",
+        "Clear termination with success status",
+        "Precise bounding box coordinates provided for all actions"
+      ],
+      "issues": [
+        "Reasoning is repetitive and lacks semantic depth",
+        "No explicit verification of UI state changes between navigation steps"
+      ],
+      "summary": "The trace successfully completes the full 6-step navigation task in Taobao with precise actions and correct sequencing. While goal coverage and alignment are perfect, the reasoning quality is limited by repetitive text-matching explanations that do not elaborate on UI context or state transitions.",
+      "overall_score": 9,
+      "sample_id": "path_0041",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0041",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“互动”标签; Step 5: 点击顶部导航栏的“优惠”标签; Step 6: 点击顶部导航栏的“其他”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:49:06",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 9,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executed all 6 required interaction steps in the correct order.",
+        "Correctly identified target elements using text matching and coordinates.",
+        "Properly concluded the task with a 'done' status and summary."
+      ],
+      "issues": [
+        "Reasoning is overly generic ('Hierarchy text matched') and ignores UI context (Top/Bottom) specified in the task.",
+        "Lacks verification of state changes or navigation results between steps.",
+        "Repetitive reasoning structure reduces insight into agent decision-making."
+      ],
+      "summary": "The trace fully completes the defined task sequence with correct actions and a successful termination. However, the reasoning quality is moderate because it relies on a static text-matching template without acknowledging the specific UI layout details (e.g., top vs. bottom navigation) provided in the task description, despite the coordinates reflecting the correct positions.",
+      "overall_score": 8,
+      "sample_id": "path_0042",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0042",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“互动”标签; Step 5: 点击顶部导航栏的“优惠”标签; Step 6: 点击顶部导航栏的“物流”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:49:21",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 8,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 9
+      },
+      "strengths": [
+        "Executes all 6 task steps exactly as described",
+        "Coordinate bounds align with top/bottom navigation descriptions",
+        "Properly terminates with a success status"
+      ],
+      "issues": [
+        "Reasoning is repetitive and lacks contextual explanation of UI state",
+        "Does not verify page transitions between navigation steps"
+      ],
+      "summary": "The trace successfully completes all 6 navigation steps defined in the task, ending with a success status. The reasoning consistently identifies targets via text matching, and coordinate bounds validate the top vs. bottom navigation locations described in the task. While the reasoning is generic, the execution is accurate and fully aligned with the goal.",
+      "overall_score": 9,
+      "sample_id": "path_0043",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0043",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“互动”标签; Step 5: 点击顶部导航栏的“优惠”标签; Step 6: 点击顶部导航栏的“提醒”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:49:45",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Executed all 6 required navigation steps in correct order",
+        "Correctly terminated with success status",
+        "Accurately identified target elements by text matching"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched')",
+        "Fails to acknowledge UI layout differences (top vs bottom navigation) in reasoning"
+      ],
+      "summary": "The trajectory fully completes the task by executing all 6 navigation steps and ending with a success status. However, the reasoning quality is limited as it consistently uses a generic template without referencing the specific UI context (e.g., distinguishing top navigation from bottom icons) required by the task description.",
+      "overall_score": 8,
+      "sample_id": "path_0044",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0044",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“互动”标签; Step 5: 点击顶部导航栏的“其他”标签; Step 6: 点击顶部导航栏的“物流”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:50:01",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Successfully executed all 6 required navigation steps in the correct order.",
+        "Correctly identified target elements using text matching and appropriate coordinates.",
+        "Properly concluded the task with a 'done' action and success status."
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched'), lacking contextual explanation of UI state.",
+        "Does not explicitly mention navigation context (e.g., switching between top and bottom bars)."
+      ],
+      "summary": "The trace fully completes the task by executing all specified navigation steps and ending with a success status. The sequence is coherent and actions align perfectly with the reasoning provided. However, the reasoning quality is moderate due to its repetitive and superficial nature, which relies solely on text matching without describing the UI context or state transitions.",
+      "overall_score": 9,
+      "sample_id": "path_0045",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0045",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“互动”标签; Step 5: 点击顶部导航栏的“其他”标签; Step 6: 点击顶部导航栏的“提醒”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:50:16",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 9,
+      "reasoning_quality_score": 5,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 9,
+        "action_reason_alignment": 9,
+        "groundedness": 6
+      },
+      "strengths": [
+        "Successfully executed all 6 required navigation steps",
+        "Correctly terminated with 'done' status",
+        "Sequence matches task description order"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic across all steps",
+        "Fails to explain UI state changes (e.g., bottom to top navigation)",
+        "Lacks visual context description beyond text matching"
+      ],
+      "summary": "The trajectory completes all specified navigation tasks with correct sequencing and termination. However, the reasoning quality is poor, relying on a static template that ignores UI state transitions and visual context, making the decision process opaque.",
+      "overall_score": 7,
+      "sample_id": "path_0046",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0046",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“互动”标签; Step 5: 点击顶部导航栏的“赞评”标签; Step 6: 点击顶部导航栏的“优惠”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:50:44",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Successfully executes all 6 required navigation steps in the correct order.",
+        "Properly terminates with a 'done' action and success status.",
+        "Action targets match the task description labels exactly."
+      ],
+      "issues": [
+        "Reasoning is overly generic and repetitive ('Hierarchy text matched') without contextual verification.",
+        "Does not explicitly confirm UI state changes or location constraints (e.g., 'bottom' for Step 2) in reasoning.",
+        "Lacks depth in explaining why specific elements were chosen beyond text matching."
+      ],
+      "summary": "The trajectory fully completes the defined task by executing all six navigation clicks in the correct sequence and ending with a success status. While the action sequence is coherent and perfectly aligned with the goal, the reasoning quality is limited by its repetitive, shallow nature, relying solely on text matching without validating UI context or state transitions.",
+      "overall_score": 8,
+      "sample_id": "path_0047",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0047",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“互动”标签; Step 5: 点击顶部导航栏的“赞评”标签; Step 6: 点击顶部导航栏的“其他”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:51:03",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 6
+      },
+      "strengths": [
+        "Successfully executed all 6 task steps and terminated with success status",
+        "Perfect alignment between actions and task instructions",
+        "Consistent action-reason mapping throughout the trace"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched')",
+        "Fails to acknowledge spatial UI details (e.g., 'bottom icon', 'top navigation')",
+        "No explanation of navigation state changes between steps"
+      ],
+      "summary": "The trajectory fully completes the 6-step task with correct termination, demonstrating perfect goal coverage and step coherence. However, reasoning quality is moderate due to repetitive, shallow text-matching explanations that ignore the specific UI layout context and navigation flow described in the instructions.",
+      "overall_score": 8,
+      "sample_id": "path_0048",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0048",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击“查看详情”按钮; Step 6: 点击物流明细",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:51:30",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 9,
+      "reasoning_quality_score": 5,
+      "subscores": {
+        "goal_coverage": 9,
+        "step_coherence": 8,
+        "action_reason_alignment": 9,
+        "groundedness": 5
+      },
+      "strengths": [
+        "Successfully executes all 6 defined task steps in the correct order",
+        "Concludes with a clear 'done' status indicating task completion",
+        "Provides precise bounding box coordinates for each action"
+      ],
+      "issues": [
+        "Reasoning is highly repetitive and generic ('Hierarchy text matched')",
+        "Lacks context about UI state or element location (e.g., top/bottom nav)",
+        "Does not explain the logic behind navigation transitions between steps"
+      ],
+      "summary": "The trajectory fully completes the specified 6-step task sequence and ends with a success status, demonstrating strong goal coverage and step coherence. However, the reasoning quality is low, relying on boilerplate text-matching statements without describing the UI context or navigation logic. Groundedness is weak as the agent does not reference visible screen states or element positioning beyond simple text matching.",
+      "overall_score": 7,
+      "sample_id": "path_0049",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0049",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击“查看详情”按钮; Step 6: 点击物流明细",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:51:49",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 5,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 9,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executed all 6 required navigation steps",
+        "Correctly identified target elements via text matching",
+        "Properly concluded with a 'done' status"
+      ],
+      "issues": [
+        "Reasoning is repetitive and lacks UI context (e.g., top vs bottom navigation)",
+        "Justification is minimal ('Hierarchy text matched') without spatial or state description"
+      ],
+      "summary": "The trajectory fully completes the task by executing all six navigation steps and ending with a success status. The actions align perfectly with the task requirements, and the coordinates reflect the correct UI layout (top vs bottom). However, the reasoning quality is low as it relies on a generic text-matching justification without explaining the UI context or spatial relationships, making the decision process opaque.",
+      "overall_score": 8,
+      "sample_id": "path_0050",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0050",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击顶部“提醒”标签; Step 6: 点击顶部导航栏的“互动”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:52:08",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executed all 6 required steps in the correct order",
+        "Correctly terminated with a 'done' status indicating task completion",
+        "Actions align perfectly with the specified targets"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched') without describing UI context",
+        "Fails to verify specific location details mentioned in task (e.g., Top vs Bottom navigation)"
+      ],
+      "summary": "The agent successfully completed the Taobao navigation task by executing all six clicks in the specified sequence and ending with a success status. The trajectory is complete and coherent, but the reasoning quality is limited by its repetitive and generic nature, which lacks descriptive context about the UI state (such as distinguishing between top and bottom navigation elements) despite the actions being correctly grounded in the target elements.",
+      "overall_score": 9,
+      "sample_id": "path_0051",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0051",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击顶部“提醒”标签; Step 6: 点击顶部导航栏的“赞评”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:52:24",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 5,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 5
+      },
+      "strengths": [
+        "Successfully executed all 6 required navigation steps",
+        "Sequence strictly follows the task description order",
+        "Final status correctly marked as success"
+      ],
+      "issues": [
+        "Reasoning is repetitive and lacks contextual detail",
+        "Does not verify spatial constraints (e.g., top vs bottom) in reasoning text",
+        "No mention of UI state changes between steps"
+      ],
+      "summary": "The trajectory fully completes the 6-step navigation task with correct action sequencing and final completion status. However, the reasoning quality is poor, relying on a generic template that matches text targets without acknowledging spatial context (top/bottom) or UI state verification, limiting the trace's interpretability.",
+      "overall_score": 8,
+      "sample_id": "path_0052",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0052",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“物流”标签; Step 5: 点击顶部“提醒”标签; Step 6: 点击顶部导航栏的“优惠”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:52:45",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 8,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Successfully executes all 6 required steps in the correct order",
+        "Correctly terminates with a 'done' action after task completion",
+        "Action coordinates align with task descriptions (top vs bottom navigation)"
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic, lacking spatial context (e.g., top vs bottom)",
+        "Does not describe UI state changes between steps",
+        "Reasoning text does not reflect the specific location instructions in the task"
+      ],
+      "summary": "The trajectory fully completes the defined task with correct step sequencing and proper termination. While the action coordinates accurately reflect the specified UI locations (top navigation vs bottom icon), the reasoning text is overly simplistic and fails to provide context regarding the UI state or spatial positioning, reducing the overall quality of the trace explanation.",
+      "overall_score": 9,
+      "sample_id": "path_0053",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0053",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“提醒”标签; Step 5: 点击顶部导航栏的“其他”标签; Step 6: 点击顶部导航栏的“互动”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:53:06",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 7,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Perfectly executes all 6 specified navigation steps",
+        "Clear termination with success status",
+        "Actions strictly follow the task sequence"
+      ],
+      "issues": [
+        "Reasoning is repetitive and template-like across all steps",
+        "Reasoning ignores specific contextual instructions (e.g., 'check notifications')",
+        "Lacks description of UI state changes between steps"
+      ],
+      "summary": "The trace successfully completes the full 6-step navigation task in Taobao with correct actions and a success status. While goal coverage and step coherence are perfect, the reasoning quality is limited by its generic nature, relying solely on text matching without acknowledging specific task nuances or UI context.",
+      "overall_score": 9,
+      "sample_id": "path_0054",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0054",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“提醒”标签; Step 5: 点击顶部导航栏的“其他”标签; Step 6: 点击顶部导航栏的“赞评”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:53:29",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    },
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 8
+      },
+      "strengths": [
+        "Executes all 6 required navigation steps in the exact order specified",
+        "Action coordinates align with task description (top vs bottom navigation)",
+        "Trace concludes with explicit success status"
+      ],
+      "issues": [
+        "Reasoning text is repetitive and lacks contextual explanation for each step",
+        "No verification of UI state changes or page loads between actions"
+      ],
+      "summary": "The trace successfully completes all 6 navigation tasks in the correct sequence with proper completion status. While action execution is precise and grounded in UI coordinates, the reasoning text is generic, relying solely on text matching without explaining context or state transitions.",
+      "overall_score": 8,
+      "sample_id": "path_0055",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0055",
+      "app_name": "淘宝",
+      "task_description": "Open 淘宝, Step 1: 点击顶部导航栏的“百亿加补”标签; Step 2: 点击底部“消息”图标查看官方通知; Step 3: 点击顶部“售后”标签; Step 4: 点击顶部导航栏的“提醒”标签; Step 5: 点击顶部导航栏的“其他”标签; Step 6: 点击顶部导航栏的“优惠”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-04-28T12:53:58",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    }
+  ]
+}

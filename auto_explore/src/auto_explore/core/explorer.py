@@ -213,6 +213,80 @@ def _compute_adaptive_similarity_threshold(hierarchy_text: str) -> float:
     return max(0.70, 0.95 - 0.01 * min(element_count, 25))
 
 
+def _normalize_candidate_target(text: str) -> str:
+    target = "".join(str(text or "").lower().split())
+    for token in (
+        "switchto",
+        "navigation",
+        "bottom",
+        "top",
+        "click",
+        "tap",
+        "open",
+        "switch",
+        "select",
+        "button",
+        "tab",
+        "nav",
+        "icon",
+        "\u70b9\u51fb",
+        "\u6253\u5f00",
+        "\u8fdb\u5165",
+        "\u5207\u6362\u5230",
+        "\u5207\u6362\u81f3",
+        "\u5207\u6362",
+        "\u9009\u62e9",
+        "\u5e95\u90e8",
+        "\u9876\u90e8",
+        "\u5bfc\u822a\u680f",
+        "\u5bfc\u822a",
+        "\u6807\u7b7e\u9875",
+        "\u6807\u7b7e",
+        "\u56fe\u6807",
+        "\u5165\u53e3",
+        "\u6309\u94ae",
+        "\u9875\u9762",
+        "\u9891\u9053",
+        "\u680f",
+        "\u7684",
+    ):
+        target = target.replace(token, "")
+    return target.strip()
+
+
+def _extract_candidate_target_key(task: str) -> str:
+    task_text = str(task or "").strip()
+    if not task_text:
+        return ""
+    quote_match = re.search(r"[\"\u201c\u201d\u300c\u300d]([^\"\u201c\u201d\u300c\u300d]+)[\"\u201c\u201d\u300c\u300d]", task_text)
+    if quote_match:
+        return _normalize_candidate_target(quote_match.group(1))
+    target_patterns = (
+        r"(?:\u70b9\u51fb|\u6253\u5f00|\u8fdb\u5165|\u5207\u6362\u5230|\u5207\u6362\u81f3|\u5207\u6362|\u9009\u62e9)\s*([^,\uff0c\u3002.;\uff1b:\uff1a]+)",
+        r"(?:click|tap|open|switch to|switch|select)\s+([^,\uff0c\u3002.;\uff1b:\uff1a]+)",
+        r"([^,\uff0c\u3002.;\uff1b:\uff1a]+?)(?:tab|\u6807\u7b7e|\u5bfc\u822a|\u5165\u53e3|\u6309\u94ae|\u56fe\u6807)",
+    )
+    for pattern in target_patterns:
+        match = re.search(pattern, task_text, flags=re.IGNORECASE)
+        if match:
+            key = _normalize_candidate_target(match.group(1))
+            if key:
+                return key
+    return ""
+
+
+def _candidate_tasks_are_duplicate(left: str, right: str, sim_threshold: float) -> tuple[bool, float, str, str]:
+    left_target = _extract_candidate_target_key(left)
+    right_target = _extract_candidate_target_key(right)
+    if left_target and right_target:
+        target_ratio = difflib.SequenceMatcher(None, left_target, right_target).ratio()
+        if left_target != right_target and target_ratio < 0.9:
+            return False, target_ratio, left_target, right_target
+        return True, target_ratio, left_target, right_target
+    ratio = difflib.SequenceMatcher(None, left, right).ratio()
+    return ratio > sim_threshold, ratio, left_target, right_target
+
+
 def _deduplicate_candidates(
     candidates: List[Dict[str, Any]],
     already_explored: Optional[List[str]] = None,
@@ -226,13 +300,15 @@ def _deduplicate_candidates(
         if already_explored:
             skip = False
             for explored in already_explored:
-                ratio = difflib.SequenceMatcher(None, task, explored).ratio()
-                if ratio > 0.8:
+                is_dup, ratio, task_target, explored_target = _candidate_tasks_are_duplicate(task, explored, 0.8)
+                if is_dup:
                     logging.info(
-                        "Candidate dedup: skip '%s' (similar to explored '%s', sim=%.2f)",
+                        "Candidate dedup: skip '%s' (similar to explored '%s', sim=%.2f, target=%s/%s)",
                         task,
                         explored,
                         ratio,
+                        task_target,
+                        explored_target,
                     )
                     skip = True
                     break
@@ -241,13 +317,15 @@ def _deduplicate_candidates(
         duplicate = False
         for prev in kept:
             prev_task = str(prev.get("single_step_task", ""))
-            ratio = difflib.SequenceMatcher(None, task, prev_task).ratio()
-            if ratio > sim_threshold:
+            is_dup, ratio, task_target, prev_target = _candidate_tasks_are_duplicate(task, prev_task, sim_threshold)
+            if is_dup:
                 logging.info(
-                    "Candidate dedup: skip '%s' (similar to kept '%s', sim=%.2f)",
+                    "Candidate dedup: skip '%s' (similar to kept '%s', sim=%.2f, target=%s/%s)",
                     task,
                     prev_task,
                     ratio,
+                    task_target,
+                    prev_target,
                 )
                 duplicate = True
                 break
@@ -348,6 +426,7 @@ def call_explorer_model(
     already_explored: Optional[List[str]] = None,
     metrics=None,
     trace_meta: Optional[Dict[str, Any]] = None,
+    disable_thinking: bool = False,
 ) -> tuple[List[Dict[str, Any]], Optional[Dict[str, Any]]]:
     prompt = build_explorer_prompt(depth, breadth, hierarchy_text, action_history, already_explored=already_explored)
 
@@ -377,13 +456,18 @@ def call_explorer_model(
             if metrics is not None:
                 timeline["attempt"] = attempt + 1
                 timeline["T2"] = metrics.relative_time(call_start)
-            response = explorer_client.chat.completions.create(
-                model=explorer_model,
-                messages=messages,
-                timeout=API_TIMEOUT,
-                max_tokens=EXPLORER_MAX_TOKENS,
-                temperature=EXPLORER_TEMPERATURE,
-            )
+            request_kwargs: Dict[str, Any] = {
+                "model": explorer_model,
+                "messages": messages,
+                "timeout": API_TIMEOUT,
+                "max_tokens": EXPLORER_MAX_TOKENS,
+                "temperature": EXPLORER_TEMPERATURE,
+            }
+            if disable_thinking:
+                request_kwargs["extra_body"] = {
+                    "chat_template_kwargs": {"enable_thinking": False},
+                }
+            response = explorer_client.chat.completions.create(**request_kwargs)
             choice = response.choices[0]
             finish_reason = getattr(choice, "finish_reason", None)
             call_end = time.perf_counter()

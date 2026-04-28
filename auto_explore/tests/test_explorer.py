@@ -40,39 +40,39 @@ class _FakeClient:
 class ExplorerParsingTests(TestCase):
     def test_parse_explorer_response_accepts_plain_json(self):
         parsed = _parse_explorer_response_content(
-            '{"candidates":[{"rank":1,"single_step_task":"点击搜索框","reason":"入口明显"}]}',
+            '{"candidates":[{"rank":1,"single_step_task":"tap search","reason":"high value"}]}',
             finish_reason="stop",
             attempt=1,
         )
-        self.assertEqual(parsed["candidates"][0]["single_step_task"], "点击搜索框")
+        self.assertEqual(parsed["candidates"][0]["single_step_task"], "tap search")
 
     def test_parse_explorer_response_accepts_fenced_json(self):
         parsed = _parse_explorer_response_content(
-            '```json\n{"candidates":[{"rank":1,"single_step_task":"点击我的","reason":"入口明显"}]}\n```',
+            '```json\n{"candidates":[{"rank":1,"single_step_task":"open cart","reason":"next step"}]}\n```',
             finish_reason="stop",
             attempt=1,
         )
-        self.assertEqual(parsed["candidates"][0]["single_step_task"], "点击我的")
+        self.assertEqual(parsed["candidates"][0]["single_step_task"], "open cart")
 
     def test_parse_explorer_response_accepts_json_with_prefix_suffix(self):
         parsed = _parse_explorer_response_content(
-            '下面是结果：{"candidates":[{"rank":1,"single_step_task":"点击购物车","reason":"高频入口"}]} 谢谢',
+            'prefix {"candidates":[{"rank":1,"single_step_task":"open profile","reason":"visible entry"}]} suffix',
             finish_reason="stop",
             attempt=1,
         )
-        self.assertEqual(parsed["candidates"][0]["single_step_task"], "点击购物车")
+        self.assertEqual(parsed["candidates"][0]["single_step_task"], "open profile")
 
     def test_parse_explorer_response_reports_truncation(self):
-        with self.assertRaisesRegex(ValueError, "疑似截断"):
+        with self.assertRaisesRegex(ValueError, "JSON"):
             _parse_explorer_response_content(
-                '{"candidates":[{"rank":1,"single_step_task":"点击我的淘宝","reason":"入口明显"}',
+                '{"candidates":[{"rank":1,"single_step_task":"tap banner","reason":"cut off"}',
                 finish_reason="length",
                 attempt=2,
             )
 
     def test_call_explorer_model_parses_fenced_json_candidates(self):
         client = _FakeClient(
-            '```json\n{"candidates":[{"rank":1,"single_step_task":"点击我的淘宝","reason":"高频入口"}]}\n```'
+            '```json\n{"candidates":[{"rank":1,"single_step_task":"tap orders","reason":"clear entry"}]}\n```'
         )
 
         candidates, popup_info = call_explorer_model(
@@ -86,7 +86,7 @@ class ExplorerParsingTests(TestCase):
         )
 
         self.assertEqual(len(candidates), 1)
-        self.assertEqual(candidates[0]["single_step_task"], "点击我的淘宝")
+        self.assertEqual(candidates[0]["single_step_task"], "tap orders")
         self.assertIsNone(popup_info)
 
     def test_call_explorer_model_rejects_non_list_candidates(self):
@@ -130,7 +130,21 @@ class ExplorerPromptTests(TestCase):
             action_history=[],
         )
 
-        self.assertIn("只输出一个 JSON object", prompt)
-        self.assertIn("不要输出任何额外文本、解释、前后缀、markdown", prompt)
-        self.assertIn("reason 必须短句化", prompt)
-        self.assertIn('例如 {"candidates": []}', prompt)
+        self.assertIn("JSON object", prompt)
+        self.assertIn("markdown", prompt)
+        self.assertIn('"candidates": []', prompt)
+        self.assertIn('"single_step_task"', prompt)
+
+    def test_build_explorer_prompt_blocks_repeated_navigation_tasks(self):
+        prompt = build_explorer_prompt(
+            depth=1,
+            breadth=2,
+            hierarchy_text="<root />",
+            action_history=[{"source_task": "click my taobao tab", "type": "click"}],
+            already_explored=["click my taobao tab"],
+        )
+
+        self.assertIn("Additional hard constraints:", prompt)
+        self.assertIn("Do not repeat a task that is already completed in the action history.", prompt)
+        self.assertIn("Do not repeat a task that is already listed as explored on the current page.", prompt)
+        self.assertIn("If a navigation/tab/icon entry is already selected", prompt)

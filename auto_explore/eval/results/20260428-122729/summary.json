@@ -1,0 +1,344 @@
+{
+  "input_path": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001",
+  "target_level": "auto",
+  "judge_model": "Qwen3.5-35B-A3B",
+  "judge_base_url": "http://166.111.53.96:7002/v1",
+  "judge_mode": "legacy_text",
+  "evaluated_at": "2026-04-28T12:27:29",
+  "sample_count": 55,
+  "success_count": 0,
+  "error_count": 55,
+  "averages": {},
+  "samples": [
+    {
+      "sample_id": "path_0001",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0001",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0002",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0002",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0003",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0003",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0004",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0004",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0005",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0005",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0006",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0006",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0007",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0007",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0008",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0008",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0009",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0009",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0010",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0010",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0011",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0011",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0012",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0012",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0013",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0013",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0014",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0014",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0015",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0015",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0016",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0016",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0017",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0017",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0018",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0018",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0019",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0019",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0020",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0020",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0021",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0021",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0022",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0022",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0023",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0023",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0024",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0024",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0025",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0025",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0026",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0026",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0027",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0027",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0028",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0028",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0029",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0029",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0030",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0030",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0031",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0031",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0032",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0032",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0033",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0033",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0034",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0034",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0035",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0035",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0036",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0036",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0037",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0037",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0038",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0038",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0039",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0039",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0040",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0040",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0041",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0041",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0042",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0042",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0043",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0043",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0044",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0044",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0045",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0045",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0046",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0046",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0047",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0047",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0048",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0048",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0049",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0049",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0050",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0050",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0051",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0051",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0052",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0052",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0053",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0053",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0054",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0054",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    },
+    {
+      "sample_id": "path_0055",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260428_114728_淘宝\\E0_full\\run_001\\data\\paths\\path_0055",
+      "status": "error",
+      "error": "Error code: 401 - {'error': 'Unauthorized'}"
+    }
+  ]
+}

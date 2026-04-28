@@ -7,10 +7,12 @@ rem Override settings with AUTO_EXPLORE_EVAL_* environment variables when needed
 
 set "TARGET_LEVEL=auto"
 set "JUDGE_MODE=legacy_text"
-set "JUDGE_BASE_URL=https://models.sjtu.edu.cn/api/v1"
-set "JUDGE_MODEL=qwen3vl"
+set "JUDGE_BASE_URL=http://166.111.53.96:7002/v1"
+set "JUDGE_MODEL=Qwen3.5-35B-A3B"
 set "OUTPUT_PATH="
 set "MAX_SAMPLES=0"
+set "MAX_TOKENS=8192"
+set "ENABLE_THINKING=on"
 set "CONTINUE_ON_ERROR=on"
 
 set "SCRIPT_DIR=%~dp0"
@@ -25,11 +27,17 @@ if defined AUTO_EXPLORE_EVAL_BASE_URL set "JUDGE_BASE_URL=%AUTO_EXPLORE_EVAL_BAS
 if defined AUTO_EXPLORE_EVAL_MODEL set "JUDGE_MODEL=%AUTO_EXPLORE_EVAL_MODEL%"
 if defined AUTO_EXPLORE_EVAL_OUTPUT_PATH set "OUTPUT_PATH=%AUTO_EXPLORE_EVAL_OUTPUT_PATH%"
 if defined AUTO_EXPLORE_EVAL_MAX_SAMPLES set "MAX_SAMPLES=%AUTO_EXPLORE_EVAL_MAX_SAMPLES%"
+if defined AUTO_EXPLORE_EVAL_MAX_TOKENS set "MAX_TOKENS=%AUTO_EXPLORE_EVAL_MAX_TOKENS%"
+if defined AUTO_EXPLORE_EVAL_ENABLE_THINKING set "ENABLE_THINKING=%AUTO_EXPLORE_EVAL_ENABLE_THINKING%"
 if defined AUTO_EXPLORE_EVAL_CONTINUE_ON_ERROR set "CONTINUE_ON_ERROR=%AUTO_EXPLORE_EVAL_CONTINUE_ON_ERROR%"
 
-set "JUDGE_API_KEY=%AUTO_EXPLORE_EVAL_API_KEY%"
-if "%JUDGE_API_KEY%"=="" if defined SJTU_API_KEY set "JUDGE_API_KEY=%SJTU_API_KEY%"
-if "%JUDGE_API_KEY%"=="" if defined OPENROUTER_API_KEY set "JUDGE_API_KEY=%OPENROUTER_API_KEY%"
+set "JUDGE_API_KEY=mobiagent-key"
+if defined AUTO_EXPLORE_EVAL_API_KEY set "JUDGE_API_KEY=%AUTO_EXPLORE_EVAL_API_KEY%"
+if not "%JUDGE_BASE_URL:http://166.111.53.96:7002/v1=%"=="%JUDGE_BASE_URL%" set "JUDGE_API_KEY=mobiagent-key"
+if not "%JUDGE_BASE_URL:http://166.111.53.96:7002/v1=%"=="%JUDGE_BASE_URL%" goto judge_key_ready
+if "%AUTO_EXPLORE_EVAL_API_KEY%"=="" if defined SJTU_API_KEY set "JUDGE_API_KEY=%SJTU_API_KEY%"
+if "%AUTO_EXPLORE_EVAL_API_KEY%"=="" if defined OPENROUTER_API_KEY set "JUDGE_API_KEY=%OPENROUTER_API_KEY%"
+:judge_key_ready
 
 if "%INPUT_PATH%"=="" (
     echo Error: INPUT_PATH is empty.
@@ -71,6 +79,8 @@ echo Target level: %TARGET_LEVEL%
 echo Judge mode: %JUDGE_MODE%
 echo Judge base URL: %JUDGE_BASE_URL%
 echo Judge model: %JUDGE_MODEL%
+echo Judge thinking: %ENABLE_THINKING%
+echo Judge max tokens: %MAX_TOKENS%
 if not "%OUTPUT_PATH%"=="" echo Output path: %OUTPUT_PATH%
 
 set CMD="%PYTHON_EXE%" -m auto_explore.eval.cli ^
@@ -81,6 +91,8 @@ set CMD="%PYTHON_EXE%" -m auto_explore.eval.cli ^
  --judge_api_key "%JUDGE_API_KEY%" ^
  --judge_model "%JUDGE_MODEL%" ^
  --max_samples "%MAX_SAMPLES%" ^
+ --max_tokens "%MAX_TOKENS%" ^
+ --enable_thinking "%ENABLE_THINKING%" ^
  --continue_on_error "%CONTINUE_ON_ERROR%"
 
 if not "%OUTPUT_PATH%"=="" set CMD=%CMD% --output_path "%OUTPUT_PATH%"

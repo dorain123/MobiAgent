@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import queue
+import re
 import threading
 import time
 import xml.etree.ElementTree as ET
@@ -24,7 +25,16 @@ from auto_explore.core.artifacts import (
     submit_artifact_task,
     write_trace_meta,
 )
-from auto_explore.core.decider import WaitActionSkip, execute_decider_one_step
+from auto_explore.core.decider import (
+    DeciderTargetMismatch,
+    InputFailed,
+    WaitActionSkip,
+    _extract_click_target_text,
+    _extract_search_or_edit_bounds,
+    _extract_text_bounds_from_hierarchy_text,
+    _task_requires_search_input,
+    execute_decider_one_step,
+)
 from auto_explore.core.explorer import (
     ExplorerCache,
     ScreenStateCache,
@@ -39,6 +49,7 @@ from auto_explore.core.fingerprints import (
     _hamming_distance_hex,
     _hierarchy_fingerprint,
     _normalize_hierarchy_text,
+    _relaxed_verify,
     _simple_verify,
     _stable_text_fingerprint,
     _triple_verify,
@@ -51,6 +62,7 @@ from auto_explore.core.navigation import (
     navigate_back,
     perform_backtrack_action,
     replay_action_record,
+    semantic_backtrack_action,
 )
 from auto_explore.core.prompting import append_done_to_path
 from auto_explore.core.ui_collect import enqueue_ui_collect_if_new
@@ -70,6 +82,7 @@ _PROGRESS_STRONG = "strong_progress"
 _PROGRESS_WEAK = "weak_progress"
 _PROGRESS_NONE = "no_progress"
 _PARTIAL_PATH_MIN_LENGTH = 3
+_TASK_REPEAT_SIMILARITY_THRESHOLD = 0.8
 _WEAK_PROGRESS_TASK_KEYWORDS = (
     "search",
     "搜索",
@@ -82,6 +95,243 @@ _WEAK_PROGRESS_TASK_KEYWORDS = (
     "发现",
     "切换",
 )
+
+
+_NAVIGATION_REPEAT_KEYWORDS = (
+    "nav",
+    "navigation",
+    "tab",
+    "icon",
+    "entry",
+    "switch",
+    "back",
+    "\u5bfc\u822a",
+    "\u5bfc\u822a\u680f",
+    "\u6807\u7b7e",
+    "\u56fe\u6807",
+    "\u5165\u53e3",
+    "\u5207\u6362",
+    "\u8fd4\u56de",
+)
+
+
+def _task_text_similarity(left: str, right: str) -> float:
+    left_text = _normalize_hierarchy_text(str(left or "")).lower()
+    right_text = _normalize_hierarchy_text(str(right or "")).lower()
+    if not left_text or not right_text:
+        return 0.0
+    return difflib.SequenceMatcher(None, left_text, right_text).ratio()
+
+
+def _normalize_repeat_target(text: str) -> str:
+    target = _normalize_hierarchy_text(str(text or "")).lower()
+    for token in (
+        "click",
+        "tap",
+        "open",
+        "switchto",
+        "switch",
+        "select",
+        "button",
+        "tab",
+        "bottom",
+        "top",
+        "navigation",
+        "nav",
+        "icon",
+        "\u70b9\u51fb",
+        "\u6253\u5f00",
+        "\u8fdb\u5165",
+        "\u5207\u6362\u5230",
+        "\u5207\u6362\u81f3",
+        "\u5207\u6362",
+        "\u9009\u62e9",
+        "\u5e95\u90e8",
+        "\u9876\u90e8",
+        "\u5bfc\u822a\u680f",
+        "\u5bfc\u822a",
+        "\u6807\u7b7e\u9875",
+        "\u6807\u7b7e",
+        "\u56fe\u6807",
+        "\u5165\u53e3",
+        "\u6309\u94ae",
+        "\u9875\u9762",
+        "\u9891\u9053",
+        "\u680f",
+        "\u7684",
+    ):
+        target = target.replace(token, "")
+    return target.strip()
+
+
+def _extract_repeat_target_key(task: str) -> str:
+    task_text = str(task or "").strip()
+    if not task_text:
+        return ""
+
+    quoted_target = _extract_click_target_text(task_text)
+    if quoted_target:
+        return _normalize_repeat_target(quoted_target)
+
+    quote_match = re.search(r"[\"\u201c\u201d\u300c\u300d]([^\"\u201c\u201d\u300c\u300d]+)[\"\u201c\u201d\u300c\u300d]", task_text)
+    if quote_match:
+        return _normalize_repeat_target(quote_match.group(1))
+
+    target_patterns = (
+        r"(?:\u70b9\u51fb|\u6253\u5f00|\u8fdb\u5165|\u5207\u6362\u5230|\u5207\u6362\u81f3|\u5207\u6362|\u9009\u62e9)\s*([^,\uff0c\u3002.;\uff1b:\uff1a]+)",
+        r"(?:click|tap|open|switch to|switch|select)\s+([^,\uff0c\u3002.;\uff1b:\uff1a]+)",
+        r"([^,\uff0c\u3002.;\uff1b:\uff1a]+?)(?:tab|\u6807\u7b7e|\u5bfc\u822a|\u5165\u53e3|\u6309\u94ae|\u56fe\u6807)",
+    )
+    for pattern in target_patterns:
+        match = re.search(pattern, task_text, flags=re.IGNORECASE)
+        if match:
+            key = _normalize_repeat_target(match.group(1))
+            if key:
+                return key
+    return ""
+
+
+def _navigation_task_is_repeated(task: str, previous_task: str) -> bool:
+    task_target = _extract_repeat_target_key(task)
+    previous_target = _extract_repeat_target_key(previous_task)
+    if task_target and previous_target:
+        target_similarity = difflib.SequenceMatcher(None, task_target, previous_target).ratio()
+        if task_target != previous_target and target_similarity < 0.9:
+            logging.info(
+                "Navigation repeat filter: keep distinct targets '%s' vs '%s'.",
+                task_target,
+                previous_target,
+            )
+            return False
+        return True
+    return _task_text_similarity(task, previous_task) > _TASK_REPEAT_SIMILARITY_THRESHOLD
+
+
+def _is_navigation_repeat_task(task: str) -> bool:
+    task_text = str(task or "").strip()
+    if not task_text:
+        return False
+    task_lower = task_text.lower()
+    return any(keyword in task_text or keyword in task_lower for keyword in _NAVIGATION_REPEAT_KEYWORDS)
+
+
+def _extract_path_level_repeat_history(path_actions: Optional[List[Dict[str, object]]]) -> List[str]:
+    history: List[str] = []
+    for item in path_actions or []:
+        task = str(item.get("source_task", "")).strip()
+        if task:
+            history.append(task)
+    return history
+
+
+def _combined_already_explored_tasks(
+    page_fp: str,
+    visited_tasks: Dict[str, set],
+    executed_tasks_by_page: Dict[str, set],
+) -> List[str]:
+    combined = set(visited_tasks.get(page_fp, set()))
+    combined.update(executed_tasks_by_page.get(page_fp, set()))
+    return sorted(combined)
+
+
+def _get_repeat_skip_reason(
+    *,
+    task: str,
+    current_page_fp: str,
+    executed_tasks_by_page: Dict[str, set],
+    path_level_repeat_history: List[str],
+) -> Optional[str]:
+    for executed_task in executed_tasks_by_page.get(current_page_fp, set()):
+        if _is_navigation_repeat_task(task) or _is_navigation_repeat_task(executed_task):
+            if _navigation_task_is_repeated(task, executed_task):
+                return "same_page"
+            continue
+        if _task_text_similarity(task, executed_task) > _TASK_REPEAT_SIMILARITY_THRESHOLD:
+            return "same_page"
+
+    if _is_navigation_repeat_task(task):
+        for previous_task in path_level_repeat_history:
+            if _navigation_task_is_repeated(task, previous_task):
+                return "path_navigation"
+
+    return None
+
+
+def _filter_repeated_candidates(
+    candidates: List[Dict[str, object]],
+    *,
+    current_page_fp: str,
+    executed_tasks_by_page: Dict[str, set],
+    path_level_repeat_history: List[str],
+) -> List[Dict[str, object]]:
+    filtered: List[Dict[str, object]] = []
+    for candidate in candidates:
+        task = str(candidate.get("single_step_task", "")).strip()
+        if not task:
+            filtered.append(candidate)
+            continue
+        repeat_reason = _get_repeat_skip_reason(
+            task=task,
+            current_page_fp=current_page_fp,
+            executed_tasks_by_page=executed_tasks_by_page,
+            path_level_repeat_history=path_level_repeat_history,
+        )
+        if repeat_reason == "same_page":
+            logging.info("Candidate repeat filter: skip same-page repeated task '%s'.", task)
+            continue
+        if repeat_reason == "path_navigation":
+            logging.info("Candidate repeat filter: skip repeated navigation task '%s'.", task)
+            continue
+        filtered.append(candidate)
+    return filtered
+
+
+def _candidate_visibility_reason(task: str, hierarchy_text: str) -> Optional[str]:
+    task_text = str(task or "").strip()
+    if not task_text:
+        return None
+
+    if _task_requires_search_input(task_text) and not _extract_search_or_edit_bounds(hierarchy_text):
+        return "candidate_not_visible: search/input control is not visible"
+
+    target_text = _extract_click_target_text(task_text)
+    if target_text and not _extract_text_bounds_from_hierarchy_text(hierarchy_text, target_text):
+        return f"candidate_not_visible: target {target_text!r} is not visible"
+
+    lowered_task = task_text.lower()
+    hierarchy_lower = str(hierarchy_text or "").lower()
+    if ("\u8bbe\u7f6e" in task_text or "setting" in lowered_task) and not (
+        "\u8bbe\u7f6e" in hierarchy_text or "setting" in hierarchy_lower or "gear" in hierarchy_lower
+    ):
+        return "candidate_not_visible: settings entry is not visible"
+
+    if ("\u6d88\u606f\u6761\u76ee" in task_text or "message item" in lowered_task) and target_text is None:
+        if not ("\u6d88\u606f" in hierarchy_text or "message" in hierarchy_lower):
+            return "candidate_not_visible: message list is not visible"
+
+    return None
+
+
+def _filter_visible_candidates(
+    candidates: List[Dict[str, object]],
+    *,
+    hierarchy_text: str,
+    current_depth: int,
+) -> List[Dict[str, object]]:
+    filtered: List[Dict[str, object]] = []
+    for candidate in candidates:
+        task = str(candidate.get("single_step_task", "")).strip()
+        reason = _candidate_visibility_reason(task, hierarchy_text)
+        if reason:
+            logging.warning(
+                "\033[93m[Depth %d] Candidate skipped (%s): %s\033[0m",
+                current_depth,
+                reason,
+                task,
+            )
+            continue
+        filtered.append(candidate)
+    return filtered
 
 
 def _current_screenshot_path(device_type: str) -> str:
@@ -345,9 +595,11 @@ def explore_dfs(
     path_actions: Optional[List[Dict[str, object]]] = None,
     path_reacts: Optional[List[Dict[str, object]]] = None,
     visited_tasks: Optional[Dict[str, set]] = None,
+    executed_tasks_by_page: Optional[Dict[str, set]] = None,
     explorer_cache: Optional["ExplorerCache"] = None,
     screen_cache: Optional["ScreenStateCache"] = None,
     popup_dismiss_max_attempts: int = 2,
+    explorer_disable_thinking: bool = False,
 ) -> None:
     """DFS exploration that executes ranked candidates and backtracks afterward."""
     if current_depth >= depth_limit:
@@ -400,15 +652,22 @@ def explore_dfs(
     action_history = list(path_actions) if path_actions else list(actions)
     if visited_tasks is None:
         visited_tasks = {}
+    if executed_tasks_by_page is None:
+        executed_tasks_by_page = {}
     no_progress_task_counts: Dict[str, int] = {}
     suppressed_no_progress_tasks: set[str] = set()
+    path_level_repeat_history = _extract_path_level_repeat_history(path_actions)
 
     current_page_fp, struct_fp, _ = compute_fingerprints(
         hierarchy_text,
         concurrent_mode=runtime.features.concurrent_fingerprint,
     )
     if runtime.features.already_explored_filter:
-        already_explored_list = list(visited_tasks.get(current_page_fp, set()))
+        already_explored_list = _combined_already_explored_tasks(
+            current_page_fp,
+            visited_tasks,
+            executed_tasks_by_page,
+        )
     else:
         already_explored_list = []
 
@@ -422,7 +681,7 @@ def explore_dfs(
             candidates = [
                 candidate
                 for candidate in cached_candidates
-                if candidate.get("single_step_task", "") not in visited_tasks.get(current_page_fp, set())
+                if candidate.get("single_step_task", "") not in set(already_explored_list)
             ]
         else:
             candidates = list(cached_candidates)
@@ -439,6 +698,7 @@ def explore_dfs(
                 action_history,
                 already_explored=already_explored_list,
                 metrics=metrics,
+                disable_thinking=explorer_disable_thinking,
                 trace_meta=_build_explorer_trace(
                     metrics,
                     current_depth=current_depth,
@@ -532,6 +792,7 @@ def explore_dfs(
                     action_history,
                     already_explored=already_explored_list,
                     metrics=metrics,
+                    disable_thinking=explorer_disable_thinking,
                     trace_meta=_build_explorer_trace(
                         metrics,
                         current_depth=current_depth,
@@ -566,9 +827,21 @@ def explore_dfs(
             for candidate in candidates
             if candidate.get("single_step_task", "") not in suppressed_no_progress_tasks
         ]
+    if runtime.features.already_explored_filter:
+        candidates = _filter_repeated_candidates(
+            candidates,
+            current_page_fp=current_page_fp,
+            executed_tasks_by_page=executed_tasks_by_page,
+            path_level_repeat_history=path_level_repeat_history,
+        )
+    candidates = _filter_visible_candidates(
+        candidates,
+        hierarchy_text=hierarchy_text,
+        current_depth=current_depth,
+    )
     if not candidates:
         _save_partial_trace(
-            reason="explorer_empty",
+            reason="candidate_not_visible",
             app_name=app_name,
             device=device,
             device_type=device_type,
@@ -634,8 +907,13 @@ def explore_dfs(
                         ui_collect_queue_size=ui_collect_queue_size,
                     )
                 new_page_fp = _hierarchy_fingerprint(base_hierarchy_text)
+                current_page_fp = new_page_fp
                 if runtime.features.already_explored_filter:
-                    new_already_explored = list(visited_tasks.get(new_page_fp, set()))
+                    new_already_explored = _combined_already_explored_tasks(
+                        new_page_fp,
+                        visited_tasks,
+                        executed_tasks_by_page,
+                    )
                 else:
                     new_already_explored = []
                 no_progress_task_counts = {}
@@ -651,6 +929,7 @@ def explore_dfs(
                         list(path_actions) if path_actions else list(actions),
                         already_explored=new_already_explored,
                         metrics=metrics,
+                        disable_thinking=explorer_disable_thinking,
                         trace_meta=_build_explorer_trace(
                             metrics,
                             current_depth=current_depth,
@@ -684,17 +963,117 @@ def explore_dfs(
                         for item in new_candidates
                         if item.get("single_step_task", "") not in suppressed_no_progress_tasks
                     ]
+                if runtime.features.already_explored_filter:
+                    new_candidates = _filter_repeated_candidates(
+                        new_candidates,
+                        current_page_fp=current_page_fp,
+                        executed_tasks_by_page=executed_tasks_by_page,
+                        path_level_repeat_history=path_level_repeat_history,
+                    )
+                new_candidates = _filter_visible_candidates(
+                    new_candidates,
+                    hierarchy_text=base_hierarchy_text,
+                    current_depth=current_depth,
+                )
+                if not new_candidates:
+                    _save_partial_trace(
+                        reason="candidate_not_visible",
+                        app_name=app_name,
+                        device=device,
+                        device_type=device_type,
+                        partial_paths_dir=partial_paths_dir,
+                        partial_path_counter=partial_path_counter,
+                        steps_dir=steps_dir,
+                        actions=list(path_actions) if path_actions else list(actions),
+                        reacts=list(path_reacts) if path_reacts else list(reacts),
+                        terminal_depth=current_depth,
+                        runtime=runtime,
+                    )
+                    return
                 candidates = candidates[:cand_idx] + new_candidates
 
         candidate = candidates[cand_idx]
         task = candidate["single_step_task"]
+
+        current_path_actions = list(path_actions) if path_actions else []
+        current_path_reacts = list(path_reacts) if path_reacts else []
+        if runtime.features.already_explored_filter:
+            repeat_reason = _get_repeat_skip_reason(
+                task=task,
+                current_page_fp=current_page_fp,
+                executed_tasks_by_page=executed_tasks_by_page,
+                path_level_repeat_history=_extract_path_level_repeat_history(current_path_actions),
+            )
+            if repeat_reason == "same_page":
+                logging.warning("[Depth %d] Candidate skipped as repeated same-page task: %s", current_depth, task)
+                cand_idx += 1
+                if cand_idx >= len(candidates):
+                    _save_partial_trace(
+                        reason="explorer_empty",
+                        app_name=app_name,
+                        device=device,
+                        device_type=device_type,
+                        partial_paths_dir=partial_paths_dir,
+                        partial_path_counter=partial_path_counter,
+                        steps_dir=steps_dir,
+                        actions=current_path_actions,
+                        reacts=current_path_reacts,
+                        terminal_depth=current_depth,
+                        runtime=runtime,
+                    )
+                    return
+                continue
+            if repeat_reason == "path_navigation":
+                logging.warning("[Depth %d] Candidate skipped as repeated navigation task: %s", current_depth, task)
+                cand_idx += 1
+                if cand_idx >= len(candidates):
+                    _save_partial_trace(
+                        reason="explorer_empty",
+                        app_name=app_name,
+                        device=device,
+                        device_type=device_type,
+                        partial_paths_dir=partial_paths_dir,
+                        partial_path_counter=partial_path_counter,
+                        steps_dir=steps_dir,
+                        actions=current_path_actions,
+                        reacts=current_path_reacts,
+                        terminal_depth=current_depth,
+                        runtime=runtime,
+                    )
+                    return
+                continue
+
+        visibility_reason = _candidate_visibility_reason(task, get_hierarchy_text(device))
+        if visibility_reason:
+            logging.warning(
+                "\033[93m[Depth %d] Candidate skipped before execution (%s): %s\033[0m",
+                current_depth,
+                visibility_reason,
+                task,
+            )
+            cand_idx += 1
+            if cand_idx >= len(candidates):
+                _save_partial_trace(
+                    reason="candidate_not_visible",
+                    app_name=app_name,
+                    device=device,
+                    device_type=device_type,
+                    partial_paths_dir=partial_paths_dir,
+                    partial_path_counter=partial_path_counter,
+                    steps_dir=steps_dir,
+                    actions=current_path_actions,
+                    reacts=current_path_reacts,
+                    terminal_depth=current_depth,
+                    runtime=runtime,
+                )
+                return
+            continue
+
         step_counter[0] += 1
         step_idx = step_counter[0]
         step_output_dir = os.path.join(steps_dir, f"step_{step_idx:04d}")
         os.makedirs(step_output_dir, exist_ok=True)
 
-        current_path_actions = list(path_actions) if path_actions else []
-        current_path_reacts = list(path_reacts) if path_reacts else []
         decider_history = [
             str(item.get("source_task", "")).strip()
             for item in current_path_actions[-10:]
@@ -714,6 +1093,7 @@ def explore_dfs(
         progress_state = _PROGRESS_NONE
         backtrack_duration_override: Optional[float] = None
         skip_heavy_backtrack = False
+        skip_heavy_backtrack_verified = False
         current_path_actions_for_recovery = current_path_actions
         pre_hierarchy_text = get_hierarchy_text(device)
         get_screenshot(device, device_type)
@@ -767,6 +1147,10 @@ def explore_dfs(
             current_path_actions.append(action_record)
             current_path_reacts.append(react_item)
             current_path_actions_for_recovery = current_path_actions
+            if runtime.features.already_explored_filter:
+                if current_page_fp not in executed_tasks_by_page:
+                    executed_tasks_by_page[current_page_fp] = set()
+                executed_tasks_by_page[current_page_fp].add(task)
 
             if screen_cache is not None:
                 screen_cache.invalidate()
@@ -826,7 +1210,7 @@ def explore_dfs(
                 logging.warning(
                     "\033[93m[Depth %d] No effective page transition after task='%s' "
                     "(similarity=%.3f >= threshold=%.3f, stable_changed=%s, struct_changed=%s, dhash=%s). "
-                    "Stopping branch expansion.\033[0m",
+                    "Skipping this candidate and trying the next sibling.\033[0m",
                     current_depth,
                     task,
                     progress_details["similarity"],
@@ -869,6 +1253,7 @@ def explore_dfs(
                         light_back_struct_fp,
                         light_back_dhash,
                     )
+                    skip_heavy_backtrack_verified = skip_heavy_backtrack
                     if not skip_heavy_backtrack:
                         backtrack_action_record = {"type": "click", "source_task": task}
                 else:
@@ -880,23 +1265,14 @@ def explore_dfs(
                         post_struct_fp,
                         post_dhash,
                     )
+                    skip_heavy_backtrack_verified = skip_heavy_backtrack
                     if not skip_heavy_backtrack:
-                        navigate_back(device, device_type)
-                        light_back_hierarchy = get_hierarchy_text(device)
-                        get_screenshot(device, device_type)
-                        light_back_screenshot_path = _current_screenshot_path(device_type)
-                        _, light_back_struct_fp, light_back_dhash = compute_fingerprints(
-                            light_back_hierarchy,
-                            screenshot_path=light_back_screenshot_path,
-                            concurrent_mode=runtime.features.concurrent_fingerprint,
-                        )
-                        skip_heavy_backtrack = _states_equivalent(
-                            pre_hierarchy_text,
-                            pre_struct_fp,
-                            pre_dhash,
-                            light_back_hierarchy,
-                            light_back_struct_fp,
-                            light_back_dhash,
+                        # No-progress clicks often only toggle transient UI state or miss the
+                        # target. Avoid expensive replay recovery; keep exploring siblings.
+                        skip_heavy_backtrack = True
+                        logging.info(
+                            "\033[93m[Depth %d] Continuing after no-progress candidate without heavy backtrack.\033[0m",
+                            current_depth,
                         )
                 backtrack_duration_override = time.perf_counter() - light_recovery_started
 
@@ -955,6 +1331,7 @@ def explore_dfs(
                     decider_model=decider_model,
                     explorer_client=explorer_client,
                     explorer_model=explorer_model,
+                    explorer_disable_thinking=explorer_disable_thinking,
                     device=device,
                     device_type=device_type,
                     use_qwen3=use_qwen3,
@@ -982,6 +1359,7 @@ def explore_dfs(
                     path_actions=current_path_actions,
                     path_reacts=current_path_reacts,
                     visited_tasks=visited_tasks,
+                    executed_tasks_by_page=executed_tasks_by_page,
                     explorer_cache=explorer_cache,
                     screen_cache=screen_cache,
                     popup_dismiss_max_attempts=popup_dismiss_max_attempts,
@@ -999,6 +1377,51 @@ def explore_dfs(
                 "\033[93m[Depth %d] Wait action - candidate '%s' skipped, not recorded.\033[0m",
                 current_depth,
                 task,
+            )
+            cand_idx += 1
+            continue
+        except DeciderTargetMismatch as e:
+            step_counter[0] -= 1
+            try:
+                import shutil
+
+                shutil.rmtree(step_output_dir)
+            except Exception:
+                pass
+            logging.warning(
+                "\033[93m[Depth %d] decider_target_mismatch - candidate skipped: %s (%s)\033[0m",
+                current_depth,
+                task,
+                e,
+            )
+            cand_idx += 1
+            continue
+        except InputFailed as e:
+            step_counter[0] -= 1
+            try:
+                import shutil
+
+                shutil.rmtree(step_output_dir)
+            except Exception:
+                pass
+            logging.warning(
+                "\033[93m[Depth %d] input_failed - candidate skipped: %s (%s)\033[0m",
+                current_depth,
+                task,
+                e,
+            )
+            _save_partial_trace(
+                reason="input_failed",
+                app_name=app_name,
+                device=device,
+                device_type=device_type,
+                partial_paths_dir=partial_paths_dir,
+                partial_path_counter=partial_path_counter,
+                steps_dir=steps_dir,
+                actions=current_path_actions_for_recovery,
+                reacts=current_path_reacts,
+                terminal_depth=current_depth,
+                runtime=runtime,
             )
             cand_idx += 1
             continue
@@ -1024,7 +1447,7 @@ def explore_dfs(
 
         if skip_heavy_backtrack:
             metrics.record_backtrack(
-                verified_without_recovery=True,
+                verified_without_recovery=skip_heavy_backtrack_verified,
                 recovery_attempts=0,
                 recovery_succeeded=False,
                 duration_sec=backtrack_duration_override or 0.0,
@@ -1034,7 +1457,13 @@ def explore_dfs(
 
         backtrack_started = time.perf_counter()
         app_was_restarted = False
-        perform_backtrack_action(device, device_type, backtrack_action_record)
+        backtrack_strategy = semantic_backtrack_action(
+            device,
+            device_type,
+            backtrack_action_record,
+            pre_hierarchy_text,
+        )
+        logging.info("Backtrack strategy attempted: %s", backtrack_strategy)
 
         post_back_hierarchy = get_hierarchy_text(device)
         if not _is_app_in_foreground(device, device_type, app_name, post_back_hierarchy):
@@ -1054,7 +1483,7 @@ def explore_dfs(
             else:
                 logging.warning("\033[91mApp did not return to foreground after restart.\033[0m")
         elif runtime.features.triple_verify:
-            verified = _triple_verify(
+            verified = _relaxed_verify(
                 pre_hierarchy_text,
                 pre_struct_fp,
                 pre_dhash,
@@ -1064,6 +1493,24 @@ def explore_dfs(
             )
         else:
             verified = _simple_verify(pre_hierarchy_text, post_back_hierarchy)
+
+        if not verified and backtrack_strategy == "semantic_tab":
+            logging.warning("\033[93mSemantic tab recovery not verified. Trying Back once before replay.\033[0m")
+            navigate_back(device, device_type)
+            post_back_hierarchy = get_hierarchy_text(device)
+            post_back_screenshot_path = _current_screenshot_path(device_type)
+            get_screenshot(device, device_type)
+            if runtime.features.triple_verify:
+                verified = _relaxed_verify(
+                    pre_hierarchy_text,
+                    pre_struct_fp,
+                    pre_dhash,
+                    post_back_hierarchy,
+                    post_back_screenshot_path,
+                    concurrent_mode=runtime.features.concurrent_fingerprint,
+                )
+            else:
+                verified = _simple_verify(pre_hierarchy_text, post_back_hierarchy)
 
         recovery_attempts = 0
         recovered = False
@@ -1084,6 +1531,7 @@ def explore_dfs(
                     continue
                 replay_hierarchy = get_hierarchy_text(device)
                 get_screenshot(device, device_type)
+                replay_screenshot_path = _current_screenshot_path(device_type)
                 if not current_path_actions_for_recovery[:-1]:
                     replay_recovered = _is_app_in_foreground(device, device_type, app_name, replay_hierarchy)
                     if replay_recovered:
@@ -1092,12 +1540,12 @@ def explore_dfs(
                         break
                     continue
                 if runtime.features.triple_verify:
-                    replay_verified = _triple_verify(
+                    replay_verified = _relaxed_verify(
                         pre_hierarchy_text,
                         pre_struct_fp,
                         pre_dhash,
                         replay_hierarchy,
-                        post_back_screenshot_path,
+                        replay_screenshot_path,
                         concurrent_mode=runtime.features.concurrent_fingerprint,
                     )
                 else:
@@ -1115,10 +1563,19 @@ def explore_dfs(
         )
 
         if not verified and not recovered:
-            logging.error(
-                "\033[91mBacktrack recovery failed after verification. Skipping remaining candidates at this depth.\033[0m"
+            latest_hierarchy = get_hierarchy_text(device)
+            if not latest_hierarchy or not _is_app_in_foreground(device, device_type, app_name, latest_hierarchy):
+                logging.error(
+                    "\033[91mBacktrack recovery failed and app/page is not recoverable. "
+                    "Skipping remaining candidates at this depth.\033[0m"
+                )
+                break
+            logging.warning(
+                "\033[93mBacktrack recovery remained unverified, but app is still foreground. "
+                "Continuing with unexecuted sibling candidates; next loop will refresh candidates if page changed.\033[0m"
             )
-            break
+            cand_idx += 1
+            continue
 
         cand_idx += 1
 
