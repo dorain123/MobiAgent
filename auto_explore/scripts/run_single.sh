@@ -18,8 +18,8 @@ BREADTH=2 # 在每一个页面探索的广度，5-10，路径总数最多为BREA
 DEVICE="Android"                 # Android | Harmony
 DECIDER_BASE_URL="http://166.111.53.96:7003/v1"
 DECIDER_MODEL="MobiMind-1.5-4B"
-# Decider API Key：通过环境变量 DECIDER_API_KEY 传入，默认为 "mobiagent-key"
-DECIDER_API_KEY="${DECIDER_API_KEY:-mobiagent-key}"
+# Decider API Key: pass via DECIDER_API_KEY. Default is empty for privacy.
+DECIDER_API_KEY="${DECIDER_API_KEY:-}"
 
 # Explorer 相关参数（使用 OpenRouter 服务）
 EXPLORER_MODEL="qwen/qwen3-vl-235b-a22b-instruct"

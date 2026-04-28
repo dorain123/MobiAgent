@@ -73,7 +73,7 @@ export PYTHONPATH="${PWD}/auto_explore/src${PYTHONPATH:+:${PYTHONPATH}}"
 
 ```bash
 export OPENROUTER_API_KEY="your-openrouter-key"
-export DECIDER_API_KEY="mobiagent-key"
+export DECIDER_API_KEY=""
 ```
 
 ## 2. 配置说明
@@ -258,7 +258,7 @@ python -m auto_explore.cli.auto_search \
   --breadth 2 \
   --device Android \
   --decider_base_url "http://166.111.53.96:7003/v1" \
-  --decider_api_key "${DECIDER_API_KEY:-mobiagent-key}" \
+  --decider_api_key "${DECIDER_API_KEY:-}" \
   --decider_model "MobiMind-1.5-4B" \
   --openrouter_base_url "https://openrouter.ai/api/v1" \
   --openrouter_api_key "$OPENROUTER_API_KEY" \
@@ -287,7 +287,7 @@ python -m auto_explore.cli.parallel_runner \
   -- \
   --device Android \
   --decider_base_url http://166.111.53.96:7003/v1 \
-  --decider_api_key "${DECIDER_API_KEY:-mobiagent-key}" \
+  --decider_api_key "${DECIDER_API_KEY:-}" \
   --decider_model MobiMind-1.5-4B \
   --openrouter_base_url https://openrouter.ai/api/v1 \
   --openrouter_api_key "$OPENROUTER_API_KEY" \

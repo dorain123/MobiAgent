@@ -46,7 +46,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--api-key",
         type=str,
-        default="mobiagent-key",
+        default="",
         help="Explorer API key, defaults to OPENROUTER_API_KEY",
     )
     parser.add_argument("--model", type=str, default="Qwen3.5-35B-A3B", help="Explorer model name")

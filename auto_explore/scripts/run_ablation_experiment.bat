@@ -31,7 +31,7 @@ if not defined SJTU_API_KEY (
     exit /b 1
 )
 
-set "DECIDER_API_KEY=mobiagent-key"
+set "DECIDER_API_KEY="
 
 rem Explorer configuration.
 rem set "EXPLORER_MODEL=qwen3vl"
@@ -39,7 +39,7 @@ rem set "OPENROUTER_BASE_URL=https://models.sjtu.edu.cn/api/v1"
 rem set "OPENROUTER_API_KEY=%SJTU_API_KEY%"
 set "EXPLORER_MODEL=Qwen3.5-35B-A3B"
 set "OPENROUTER_BASE_URL=http://166.111.53.96:7002/v1"
-set "OPENROUTER_API_KEY=mobiagent-key"
+set "OPENROUTER_API_KEY="
 set "EXPLORER_DISABLE_THINKING=on"
 
 rem Runtime options.

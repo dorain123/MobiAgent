@@ -21,7 +21,7 @@ if not defined SJTU_API_KEY (
     exit /b 1
 )
 
-set "DECIDER_API_KEY=mobiagent-key"
+set "DECIDER_API_KEY="
 
 rem Explorer configuration.
 set "EXPLORER_MODEL=qwen3vl"

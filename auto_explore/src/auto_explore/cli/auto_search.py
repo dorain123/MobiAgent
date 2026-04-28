@@ -45,7 +45,7 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument("--service_ip", type=str, default="localhost", help="Decider service IP")
     parser.add_argument("--decider_port", type=int, default=8000, help="Decider service port")
 
-    parser.add_argument("--decider_api_key", type=str, default=os.getenv("DECIDER_API_KEY", "mobiagent-key"), help="Decider API key")
+    parser.add_argument("--decider_api_key", type=str, default=os.getenv("DECIDER_API_KEY", ""), help="Decider API key")
     parser.add_argument("--decider_base_url", type=str, default="", help="Decider base URL")
     parser.add_argument("--decider_model", type=str, default="", help="Decider model name")
 

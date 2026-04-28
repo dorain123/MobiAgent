@@ -34,7 +34,7 @@ EXTRA_SIMULATORS=()
 DEVICE="Android"
 DECIDER_BASE_URL="http://166.111.53.96:7003/v1"
 DECIDER_MODEL="MobiMind-1.5-4B"
-DECIDER_API_KEY="${DECIDER_API_KEY:-mobiagent-key}"
+DECIDER_API_KEY="${DECIDER_API_KEY:-}"
 
 EXPLORER_MODEL="qwen/qwen3-vl-235b-a22b-instruct"
 OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
