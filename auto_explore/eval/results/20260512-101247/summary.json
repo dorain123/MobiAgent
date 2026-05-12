@@ -1,0 +1,52 @@
+{
+  "input_path": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260510_235147_今日头条\\E0_full\\run_001\\data\\paths\\path_0001",
+  "target_level": "auto",
+  "judge_model": "Qwen3.5-35B-A3B",
+  "judge_base_url": "http://166.111.53.96:7002/v1",
+  "judge_mode": "legacy_text",
+  "evaluated_at": "2026-05-12T10:12:47",
+  "sample_count": 1,
+  "success_count": 1,
+  "error_count": 0,
+  "averages": {
+    "trajectory_completeness_score": 10.0,
+    "reasoning_quality_score": 6.0,
+    "overall_score": 8.0
+  },
+  "samples": [
+    {
+      "trajectory_completeness_score": 10,
+      "reasoning_quality_score": 6,
+      "subscores": {
+        "goal_coverage": 10,
+        "step_coherence": 10,
+        "action_reason_alignment": 10,
+        "groundedness": 7
+      },
+      "strengths": [
+        "Successfully executed all 6 navigation steps in the correct order.",
+        "Properly concluded the task with a 'done' status.",
+        "Action targets matched the text specified in the task description."
+      ],
+      "issues": [
+        "Reasoning is repetitive and generic ('Hierarchy text matched') without referencing spatial context (e.g., top/bottom nav).",
+        "Reasoning does not verify UI state changes or confirm element location relative to the task description."
+      ],
+      "summary": "The trajectory successfully completes all required navigation steps in the correct sequence and ends with a success status. However, the reasoning quality is limited by its repetitive and shallow nature, relying solely on text matching without acknowledging the specific UI locations (top/bottom navigation bars) described in the task.",
+      "overall_score": 8,
+      "sample_id": "path_0001",
+      "sample_kind": "path",
+      "trace_dir": "D:\\cdl\\MobiAgent\\auto_explore\\results\\ablation\\20260510_235147_今日头条\\E0_full\\run_001\\data\\paths\\path_0001",
+      "app_name": "今日头条",
+      "task_description": "Open 今日头条, Step 1: 点击底部导航栏的“视频”标签; Step 2: 点击顶部导航栏的“关注”标签; Step 3: 点击顶部导航栏的“精选”标签; Step 4: 点击顶部导航栏的“推荐”标签; Step 5: 点击顶部导航栏的“听音乐”标签; Step 6: 点击底部导航栏的“任务”标签",
+      "action_count": 7,
+      "step_count": 7,
+      "image_count": 7,
+      "judge_mode": "legacy_text",
+      "evaluated_at": "2026-05-12T10:12:47",
+      "judge_model": "Qwen3.5-35B-A3B",
+      "judge_base_url": "http://166.111.53.96:7002/v1",
+      "status": "ok"
+    }
+  ]
+}

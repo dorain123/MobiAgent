@@ -6,11 +6,11 @@ rem Auto-search ablation template for Windows.
 rem For Chinese app names, prefer setting AUTO_EXPLORE_APP_NAME in the shell before running.
 rem Keep the default APP_NAME ASCII-only to avoid Windows batch encoding issues.
 
-set "APP_NAME=DemoApp"
-set "DEPTH=8"
-set "BREADTH=15"
+set "APP_NAME=今日头条"
+set "DEPTH=6"
+set "BREADTH=10"
 set "DEVICE=Android"
-set "REPEATS=3"
+set "REPEATS=2"
 
 rem Decider configuration.
 set "DECIDER_BASE_URL=http://166.111.53.96:7003/v1"
