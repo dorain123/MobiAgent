@@ -1,63 +1,57 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Auto Search 运行参数模板
-# 使用方式：
-# 1) 修改下面变量
-# 2) 执行: bash auto_explore/scripts/run_single.sh
+# Auto-search single-run template.
+#
+# Privacy note:
+#   Do not write API keys or private service URLs into this file.
+#   Pass them from environment variables instead, for example:
+#     export AUTO_EXPLORE_DECIDER_BASE_URL=https://your-decider-endpoint/v1
+#     export DECIDER_API_KEY=your-decider-api-key
+#     export AUTO_EXPLORE_EXPLORER_BASE_URL=https://your-explorer-endpoint/v1
+#     export OPENROUTER_API_KEY=your-explorer-api-key
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AUTO_EXPLORE_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 REPO_ROOT="$(cd "${AUTO_EXPLORE_ROOT}/.." && pwd)"
 
-APP_NAME="淘宝"
-DEPTH=2 # 探索页面的深度，3-4
-BREADTH=2 # 在每一个页面探索的广度，5-10，路径总数最多为BREADTH的DEPTH次方
+APP_NAME="${AUTO_EXPLORE_APP_NAME:-DemoApp}"
+DEPTH="${AUTO_EXPLORE_DEPTH:-2}"
+BREADTH="${AUTO_EXPLORE_BREADTH:-2}"
 
-# Decider 相关参数（使用 DECIDER_BASE_URL）
-DEVICE="Android"                 # Android | Harmony
-DECIDER_BASE_URL="http://166.111.53.96:7003/v1"
-DECIDER_MODEL="MobiMind-1.5-4B"
-# Decider API Key: pass via DECIDER_API_KEY. Default is empty for privacy.
+DEVICE="${AUTO_EXPLORE_DEVICE:-Android}"
+DECIDER_BASE_URL="${AUTO_EXPLORE_DECIDER_BASE_URL:-}"
+DECIDER_MODEL="${AUTO_EXPLORE_DECIDER_MODEL:-MobiMind-1.5-4B}"
 DECIDER_API_KEY="${DECIDER_API_KEY:-}"
 
-# Explorer 相关参数（使用 OpenRouter 服务）
-EXPLORER_MODEL="qwen/qwen3-vl-235b-a22b-instruct"
-OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
-# Explorer API Key：通过环境变量 OPENROUTER_API_KEY 传入（必需）
-: "${OPENROUTER_API_KEY:?Please export OPENROUTER_API_KEY first}"
-USE_QWEN3="on"                   # on | off
-DATA_DIR=""                      # 为空时使用默认输出目录
-ALLOW_HIERARCHY_TEXT_DECIDER="off"
-ENABLE_UI_SEMANTIC_COLLECT="on"   # on | off, 是否在auto-search过程中启用UI语义信息收集模块
-                                  #提供给VLM更丰富的页面信息以辅助决策；开启后会增加一定的API调用和整体运行时间，请根据需要选择是否开启
+EXPLORER_MODEL="${AUTO_EXPLORE_EXPLORER_MODEL:-qwen/qwen3-vl-235b-a22b-instruct}"
+OPENROUTER_BASE_URL="${AUTO_EXPLORE_EXPLORER_BASE_URL:-https://openrouter.ai/api/v1}"
+OPENROUTER_API_KEY="${AUTO_EXPLORE_EXPLORER_API_KEY:-${OPENROUTER_API_KEY:-}}"
+: "${OPENROUTER_API_KEY:?Please export OPENROUTER_API_KEY or AUTO_EXPLORE_EXPLORER_API_KEY first}"
 
-# BBox 精炼阈值（换模型/换手机时调整）
-# BBOX_IOU_THRESHOLD:      IoU >= 此值则用 XML 元素边框（模型越不准确 → 调低，如 0.1）
-# BBOX_CENTER_DIST_RATIO:  中心距/对角线 <= 此值才匹配（偏差大 → 调高，如 0.15）
-# BBOX_AREA_RATIO_MIN/MAX: 候选元素面积/模型bbox面积的允许范围
-BBOX_IOU_THRESHOLD=0.1
-BBOX_CENTER_DIST_RATIO=0.15
-BBOX_AREA_RATIO_MIN=0.3
-BBOX_AREA_RATIO_MAX=3.0
+USE_QWEN3="${AUTO_EXPLORE_USE_QWEN3:-on}"
+DATA_DIR="${AUTO_EXPLORE_DATA_DIR:-}"
+ALLOW_HIERARCHY_TEXT_DECIDER="${AUTO_EXPLORE_ALLOW_HIERARCHY_TEXT_DECIDER:-off}"
+ENABLE_UI_SEMANTIC_COLLECT="${AUTO_EXPLORE_ENABLE_UI_SEMANTIC_COLLECT:-on}"
 
-# 弹窗自动关闭（Explorer VLM 检测到广告/弹窗时自动点关闭按钮）
-# POPUP_DISMISS_MAX_ATTEMPTS: 最多尝试几次（0 表示禁用，建议 2）
-POPUP_DISMISS_MAX_ATTEMPTS=2
+BBOX_IOU_THRESHOLD="${AUTO_EXPLORE_BBOX_IOU_THRESHOLD:-0.1}"
+BBOX_CENTER_DIST_RATIO="${AUTO_EXPLORE_BBOX_CENTER_DIST_RATIO:-0.15}"
+BBOX_AREA_RATIO_MIN="${AUTO_EXPLORE_BBOX_AREA_RATIO_MIN:-0.3}"
+BBOX_AREA_RATIO_MAX="${AUTO_EXPLORE_BBOX_AREA_RATIO_MAX:-3.0}"
+POPUP_DISMISS_MAX_ATTEMPTS="${AUTO_EXPLORE_POPUP_DISMISS_MAX_ATTEMPTS:-2}"
 
-UI_COLLECT_ASYNC="on"             # on | off
-UI_COLLECT_QUEUE_SIZE=8
-UI_COLLECT_DRAIN_ON_EXIT="on"     # on | off
-UI_COLLECT_DRAIN_TIMEOUT_SEC=180
-UI_COLLECT_USE_VLM="on"           # on | off
-UI_COLLECT_VLM_TEXT_ONLY="off"    # on | off，当页面中存在歧义的元素或者需要更准确的对象描述时，开启；只使用VLM提供的文本，层级信息仍然来自页面结构
-UI_COLLECT_VLM_MODEL="qwen/qwen3-vl-30b-a3b-instruct" # qwen/qwen3.5-35b-a3b
-UI_COLLECT_BASE_URL="${OPENROUTER_BASE_URL}"  # 可单独指定UI采集模型提供商，例如本地vLLM: http://127.0.0.1:8001/v1
-UI_COLLECT_API_KEY="${OPENROUTER_API_KEY}"    # 可单独指定UI采集key；本地vLLM通常可留空
-UI_COLLECT_MAX_ITEMS=32
-UI_COLLECT_MAX_VLM_CALLS=12
-UI_COLLECT_MIN_AREA=16
-
+UI_COLLECT_ASYNC="${AUTO_EXPLORE_UI_COLLECT_ASYNC:-on}"
+UI_COLLECT_QUEUE_SIZE="${AUTO_EXPLORE_UI_COLLECT_QUEUE_SIZE:-8}"
+UI_COLLECT_DRAIN_ON_EXIT="${AUTO_EXPLORE_UI_COLLECT_DRAIN_ON_EXIT:-on}"
+UI_COLLECT_DRAIN_TIMEOUT_SEC="${AUTO_EXPLORE_UI_COLLECT_DRAIN_TIMEOUT_SEC:-180}"
+UI_COLLECT_USE_VLM="${AUTO_EXPLORE_UI_COLLECT_USE_VLM:-on}"
+UI_COLLECT_VLM_TEXT_ONLY="${AUTO_EXPLORE_UI_COLLECT_VLM_TEXT_ONLY:-off}"
+UI_COLLECT_VLM_MODEL="${AUTO_EXPLORE_UI_COLLECT_VLM_MODEL:-qwen/qwen3-vl-30b-a3b-instruct}"
+UI_COLLECT_BASE_URL="${AUTO_EXPLORE_UI_COLLECT_BASE_URL:-${OPENROUTER_BASE_URL}}"
+UI_COLLECT_API_KEY="${AUTO_EXPLORE_UI_COLLECT_API_KEY:-${OPENROUTER_API_KEY}}"
+UI_COLLECT_MAX_ITEMS="${AUTO_EXPLORE_UI_COLLECT_MAX_ITEMS:-32}"
+UI_COLLECT_MAX_VLM_CALLS="${AUTO_EXPLORE_UI_COLLECT_MAX_VLM_CALLS:-12}"
+UI_COLLECT_MIN_AREA="${AUTO_EXPLORE_UI_COLLECT_MIN_AREA:-16}"
 
 export PYTHONPATH="${AUTO_EXPLORE_ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}"
 

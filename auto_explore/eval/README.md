@@ -78,4 +78,6 @@ Notes:
 
 - `path_multimodal` only supports `path_*` samples.
 - It does not silently downgrade to `steps/`.
-- The summary averages only `trajectory_completeness_score` and `image_coherence_score`.
+- Each step sends the original numbered screenshot and, when present, the matching `N_click_point.jpg`.
+- The summary averages `trajectory_completeness_score`, `image_coherence_score`, and `task_operation_match_score`.
+- If evaluation is interrupted, a partial summary is written with `interrupted`, `planned_sample_count`, `evaluated_sample_count`, and `remaining_sample_count`.

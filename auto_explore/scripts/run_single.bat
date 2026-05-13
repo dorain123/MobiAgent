@@ -5,6 +5,14 @@ setlocal enabledelayedexpansion
 rem Auto-search single-run template for Windows.
 rem For Chinese app names, prefer setting AUTO_EXPLORE_APP_NAME in the shell before running.
 rem Keep the default APP_NAME ASCII-only to avoid Windows batch encoding issues.
+rem
+rem Privacy note:
+rem   Do not write API keys or private service URLs into this file.
+rem   Pass them from environment variables instead, for example:
+rem     set AUTO_EXPLORE_DECIDER_BASE_URL=https://your-decider-endpoint/v1
+rem     set DECIDER_API_KEY=your-decider-api-key
+rem     set AUTO_EXPLORE_EXPLORER_BASE_URL=https://your-explorer-endpoint/v1
+rem     set OPENROUTER_API_KEY=your-explorer-api-key
 
 set "APP_NAME=DemoApp"
 set "DEPTH=1"
@@ -12,21 +20,14 @@ set "BREADTH=1"
 set "DEVICE=Android"
 
 rem Decider configuration.
-set "DECIDER_BASE_URL=http://166.111.53.96:7003/v1"
+set "DECIDER_BASE_URL="
 set "DECIDER_MODEL=MobiMind-1.5-4B"
-
-if not defined SJTU_API_KEY (
-    echo Error: Please set SJTU_API_KEY environment variable first.
-    pause
-    exit /b 1
-)
-
 set "DECIDER_API_KEY="
 
 rem Explorer configuration.
 set "EXPLORER_MODEL=qwen3vl"
-set "OPENROUTER_BASE_URL=https://models.sjtu.edu.cn/api/v1"
-set "OPENROUTER_API_KEY=%SJTU_API_KEY%"
+set "OPENROUTER_BASE_URL=https://openrouter.ai/api/v1"
+set "OPENROUTER_API_KEY="
 
 rem Runtime options.
 set "USE_QWEN3=on"
@@ -52,7 +53,7 @@ set "UI_COLLECT_USE_VLM=on"
 set "UI_COLLECT_VLM_TEXT_ONLY=off"
 set "UI_COLLECT_VLM_MODEL=qwen/qwen3-vl-30b-a3b-instruct"
 set "UI_COLLECT_BASE_URL=%OPENROUTER_BASE_URL%"
-set "UI_COLLECT_API_KEY=%OPENROUTER_API_KEY%"
+set "UI_COLLECT_API_KEY="
 set "UI_COLLECT_MAX_ITEMS=32"
 set "UI_COLLECT_MAX_VLM_CALLS=12"
 set "UI_COLLECT_MIN_AREA=16"
@@ -60,6 +61,23 @@ set "UI_COLLECT_MIN_AREA=16"
 if defined AUTO_EXPLORE_APP_NAME set "APP_NAME=%AUTO_EXPLORE_APP_NAME%"
 if defined AUTO_EXPLORE_DEPTH set "DEPTH=%AUTO_EXPLORE_DEPTH%"
 if defined AUTO_EXPLORE_BREADTH set "BREADTH=%AUTO_EXPLORE_BREADTH%"
+if defined AUTO_EXPLORE_DEVICE set "DEVICE=%AUTO_EXPLORE_DEVICE%"
+if defined AUTO_EXPLORE_DECIDER_BASE_URL set "DECIDER_BASE_URL=%AUTO_EXPLORE_DECIDER_BASE_URL%"
+if defined AUTO_EXPLORE_DECIDER_MODEL set "DECIDER_MODEL=%AUTO_EXPLORE_DECIDER_MODEL%"
+if defined DECIDER_API_KEY set "DECIDER_API_KEY=%DECIDER_API_KEY%"
+if defined AUTO_EXPLORE_EXPLORER_MODEL set "EXPLORER_MODEL=%AUTO_EXPLORE_EXPLORER_MODEL%"
+if defined AUTO_EXPLORE_EXPLORER_BASE_URL set "OPENROUTER_BASE_URL=%AUTO_EXPLORE_EXPLORER_BASE_URL%"
+if defined OPENROUTER_API_KEY set "OPENROUTER_API_KEY=%OPENROUTER_API_KEY%"
+if defined AUTO_EXPLORE_EXPLORER_API_KEY set "OPENROUTER_API_KEY=%AUTO_EXPLORE_EXPLORER_API_KEY%"
+if defined AUTO_EXPLORE_UI_COLLECT_BASE_URL set "UI_COLLECT_BASE_URL=%AUTO_EXPLORE_UI_COLLECT_BASE_URL%"
+if defined AUTO_EXPLORE_UI_COLLECT_API_KEY set "UI_COLLECT_API_KEY=%AUTO_EXPLORE_UI_COLLECT_API_KEY%"
+if "%UI_COLLECT_API_KEY%"=="" set "UI_COLLECT_API_KEY=%OPENROUTER_API_KEY%"
+
+if "%OPENROUTER_API_KEY%"=="" (
+    echo Error: Please set OPENROUTER_API_KEY or AUTO_EXPLORE_EXPLORER_API_KEY before running.
+    pause
+    exit /b 1
+)
 
 if "%APP_NAME%"=="" (
     echo Error: APP_NAME is empty.
@@ -126,6 +144,8 @@ if not "%DATA_DIR%"=="" set CMD=%CMD% --data_dir "%DATA_DIR%"
 
 pushd "%SRC_ROOT%"
 %CMD%
+set "EXIT_CODE=%ERRORLEVEL%"
 popd
 
 pause
+exit /b %EXIT_CODE%

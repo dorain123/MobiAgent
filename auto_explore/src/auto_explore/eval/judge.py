@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import json
 import mimetypes
+import re
 from collections.abc import Iterable, Mapping
 from datetime import datetime
 from functools import lru_cache
@@ -12,7 +13,6 @@ from typing import Any, Dict, List
 
 from openai import OpenAI
 
-from auto_explore.adapters.device import robust_json_loads
 from auto_explore.eval.loader import render_trace_for_prompt
 
 
@@ -32,12 +32,14 @@ LEGACY_SUBSCORE_FIELDS = (
 PATH_MULTIMODAL_MAIN_SCORE_FIELDS = (
     "trajectory_completeness_score",
     "image_coherence_score",
+    "task_operation_match_score",
 )
 PATH_MULTIMODAL_SUBSCORE_FIELDS = (
-    "depth_reached",
-    "termination_quality",
+    "goal_coverage",
+    "visual_action_alignment",
+    "click_target_grounding",
     "inter_image_continuity",
-    "reasoning_context_consistency",
+    "termination_quality",
 )
 
 PROMPT_ROOT = Path(__file__).resolve().parents[3] / "eval"
@@ -93,6 +95,66 @@ def _extract_json_object_text(text: str) -> str:
             if depth == 0:
                 return stripped[start : idx + 1]
     return stripped[start:]
+
+
+def _json_loads_relaxed(text: str) -> Any:
+    cleaned = re.sub(r",\s*([}\]])", r"\1", text.strip())
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        pass
+
+    repaired = cleaned
+    if repaired.count('"') % 2 == 1:
+        repaired += '"'
+    repaired += "]" * max(0, repaired.count("[") - repaired.count("]"))
+    repaired += "}" * max(0, repaired.count("{") - repaired.count("}"))
+    repaired = re.sub(r",\s*([}\]])", r"\1", repaired)
+    return json.loads(repaired)
+
+
+def _regex_score_payload(text: str, *, judge_mode: str) -> Dict[str, Any]:
+    score_names = (
+        (*PATH_MULTIMODAL_MAIN_SCORE_FIELDS, *PATH_MULTIMODAL_SUBSCORE_FIELDS)
+        if judge_mode == JUDGE_MODE_PATH_MULTIMODAL
+        else (*LEGACY_MAIN_SCORE_FIELDS, *LEGACY_SUBSCORE_FIELDS)
+    )
+    extracted: Dict[str, int] = {}
+    for name in score_names:
+        match = re.search(rf'"{re.escape(name)}"\s*:\s*(-?\d+(?:\.\d+)?)', text)
+        if match:
+            extracted[name] = _clamp_score(match.group(1), name)
+
+    required = PATH_MULTIMODAL_MAIN_SCORE_FIELDS if judge_mode == JUDGE_MODE_PATH_MULTIMODAL else LEGACY_MAIN_SCORE_FIELDS
+    missing_required = [name for name in required if name not in extracted]
+    if missing_required:
+        raise ValueError(f"Judge response is missing required scores after relaxed parsing: {missing_required}")
+
+    payload: Dict[str, Any] = {name: extracted[name] for name in required}
+    payload["subscores"] = {name: extracted[name] for name in score_names if name in extracted and name not in required}
+
+    summary_match = re.search(r'"summary"\s*:\s*"((?:\\.|[^"\\])*)', text, flags=re.DOTALL)
+    if summary_match:
+        try:
+            payload["summary"] = json.loads(f'"{summary_match.group(1)}"')
+        except Exception:
+            payload["summary"] = summary_match.group(1).strip()
+    else:
+        payload["summary"] = "Judge returned parseable scores but no complete summary."
+    payload["strengths"] = ["Scores recovered from a malformed judge response."]
+    payload["issues"] = ["Judge response was not valid JSON; non-score fields may be incomplete."]
+    return payload
+
+
+def _load_judge_payload(raw_text: str, *, judge_mode: str) -> Dict[str, Any]:
+    object_text = _extract_json_object_text(raw_text)
+    try:
+        payload = _json_loads_relaxed(object_text)
+    except Exception:
+        payload = _regex_score_payload(object_text or raw_text, judge_mode=judge_mode)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Judge response is not a JSON object: {raw_text}")
+    return payload
 
 
 def _clamp_score(value: Any, field_name: str) -> int:
@@ -165,6 +227,10 @@ def _normalize_judge_payload(payload: Mapping[str, Any], *, judge_mode: str) -> 
             "image_coherence_score": _clamp_score(
                 payload.get("image_coherence_score", 1),
                 "image_coherence_score",
+            ),
+            "task_operation_match_score": _clamp_score(
+                payload.get("task_operation_match_score", 1),
+                "task_operation_match_score",
             ),
             "subscores": normalized_subscores,
             "strengths": _normalize_list(payload.get("strengths"), fallback="No clear strengths provided."),
@@ -243,7 +309,11 @@ def _render_multimodal_step_context(step: Mapping[str, Any], *, max_reasoning_ch
         lines.append(f"bounds: {step.get('bounds')}")
     if step.get("position_x") is not None and step.get("position_y") is not None:
         lines.append(f"position: [{step.get('position_x')}, {step.get('position_y')}]")
-    lines.append("Read this step text first, then inspect the next screenshot.")
+    if step.get("has_click_point_image"):
+        lines.append("visual_evidence: original screenshot followed by click-point screenshot.")
+    else:
+        lines.append("visual_evidence: original screenshot only; click-point screenshot is missing.")
+    lines.append("Read this step text first, inspect the original screenshot, then inspect the click-point screenshot if present.")
     return "\n".join(lines)
 
 
@@ -291,6 +361,7 @@ def _build_path_multimodal_messages(
                 "text": _render_multimodal_step_context(step, max_reasoning_chars=max_reasoning_chars),
             }
         )
+        content.append({"type": "text", "text": f"[Step {step.get('image_index', '')} Original Screenshot]"})
         content.append(
             {
                 "type": "image_url",
@@ -299,6 +370,17 @@ def _build_path_multimodal_messages(
                 },
             }
         )
+        click_point_image_path = str(step.get("click_point_image_path", "") or "").strip()
+        if click_point_image_path:
+            content.append({"type": "text", "text": f"[Step {step.get('image_index', '')} Click-Point Screenshot]"})
+            content.append(
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": _encode_image_as_data_url(click_point_image_path),
+                    },
+                }
+            )
 
     terminal_step_records = sample.get("terminal_step_records", [])
     if isinstance(terminal_step_records, list):
@@ -377,9 +459,7 @@ class LLMTrajectoryJudge:
             request_kwargs["response_format"] = {"type": "json_object"}
         response = self.client.chat.completions.create(**request_kwargs)
         raw_text = _extract_response_text(response).strip()
-        payload = robust_json_loads(_extract_json_object_text(raw_text))
-        if not isinstance(payload, dict):
-            raise ValueError(f"Judge response is not a JSON object: {raw_text}")
+        payload = _load_judge_payload(raw_text, judge_mode=self.judge_mode)
         normalized = _normalize_judge_payload(payload, judge_mode=self.judge_mode)
         normalized.update(
             {
@@ -408,9 +488,12 @@ def summarize_batch_results(
     judge_base_url: str,
     judge_mode: str = JUDGE_MODE_LEGACY_TEXT,
     results: Iterable[Mapping[str, Any]],
+    interrupted: bool = False,
+    planned_sample_count: int | None = None,
 ) -> Dict[str, Any]:
     result_list = [dict(item) for item in results]
     successful = [item for item in result_list if item.get("status") != "error"]
+    planned_count = len(result_list) if planned_sample_count is None else int(planned_sample_count)
     summary = {
         "input_path": input_path,
         "target_level": target_level,
@@ -418,6 +501,10 @@ def summarize_batch_results(
         "judge_base_url": judge_base_url,
         "judge_mode": judge_mode,
         "evaluated_at": datetime.now().isoformat(timespec="seconds"),
+        "interrupted": bool(interrupted),
+        "planned_sample_count": planned_count,
+        "evaluated_sample_count": len(result_list),
+        "remaining_sample_count": max(0, planned_count - len(result_list)),
         "sample_count": len(result_list),
         "success_count": len(successful),
         "error_count": len(result_list) - len(successful),
@@ -428,4 +515,14 @@ def summarize_batch_results(
         fields = PATH_MULTIMODAL_MAIN_SCORE_FIELDS if judge_mode == JUDGE_MODE_PATH_MULTIMODAL else (*LEGACY_MAIN_SCORE_FIELDS, "overall_score")
         for field_name in fields:
             summary["averages"][field_name] = round(mean(float(item[field_name]) for item in successful), 3)
+        subscore_fields = PATH_MULTIMODAL_SUBSCORE_FIELDS if judge_mode == JUDGE_MODE_PATH_MULTIMODAL else LEGACY_SUBSCORE_FIELDS
+        for field_name in subscore_fields:
+            values = [
+                float(subscores[field_name])
+                for item in successful
+                for subscores in [item.get("subscores", {})]
+                if isinstance(subscores, Mapping) and field_name in subscores
+            ]
+            if values:
+                summary["averages"][field_name] = round(mean(values), 3)
     return summary

@@ -40,7 +40,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--base-url",
         type=str,
-        default="http://166.111.53.96:7002/v1",
+        default=os.getenv("AUTO_EXPLORE_EXPLORER_BASE_URL", "https://openrouter.ai/api/v1"),
         help="Explorer provider base URL",
     )
     parser.add_argument(

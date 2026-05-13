@@ -14,5 +14,6 @@ Metadata:
 - stats: {{STATS_JSON}}
 
 Read the following content in order.
-For each step, read the step text first and then inspect the screenshot that immediately follows it.
-Base the final judgment on the full path, not on a single step.
+For each step, read the step text first, inspect the original screenshot, and then inspect the click-point screenshot if one is provided.
+Use the click-point screenshot to judge whether the operation lands on the intended UI element.
+Base the final judgment on the full path, the task description, the operation sequence, and the visual evidence, not on a single step or a final done status alone.

@@ -201,6 +201,17 @@ def _load_numbered_images(trace_dir: Path, *, require_contiguous: bool = True) -
     return ordered
 
 
+def _find_click_point_image(image_path: Path) -> Optional[Path]:
+    candidates = [
+        image_path.with_name(f"{image_path.stem}_click_point{suffix}")
+        for suffix in (image_path.suffix, ".jpg", ".jpeg", ".png")
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate.resolve()
+    return None
+
+
 def _attach_path_multimodal_fields(sample: Dict[str, Any], trace_dir: Path) -> None:
     if sample["sample_kind"] != "path":
         raise ValueError(
@@ -233,8 +244,11 @@ def _attach_path_multimodal_fields(sample: Dict[str, Any], trace_dir: Path) -> N
     image_step_records: List[Dict[str, Any]] = []
     for image_index, image_path in enumerate(image_paths, start=1):
         step_record = dict(step_records[image_index - 1])
+        click_point_path = _find_click_point_image(image_path)
         step_record["image_index"] = image_index
         step_record["image_path"] = str(image_path)
+        step_record["click_point_image_path"] = str(click_point_path) if click_point_path is not None else ""
+        step_record["has_click_point_image"] = click_point_path is not None
         image_step_records.append(step_record)
 
     terminal_step_records = [dict(item) for item in step_records[len(image_paths) :]]

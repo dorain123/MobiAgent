@@ -16,6 +16,12 @@ from auto_explore.eval.judge import (
 from auto_explore.eval.loader import collect_trace_dirs, load_trace_sample
 
 
+class EvaluationInterrupted(RuntimeError):
+    def __init__(self, summary: Dict[str, Any]) -> None:
+        super().__init__("Evaluation interrupted; partial summary was written.")
+        self.summary = summary
+
+
 def _default_judge_base_url() -> str:
     explicit = os.getenv("AUTO_EXPLORE_EVAL_BASE_URL", "").strip()
     if explicit:
@@ -90,6 +96,30 @@ def _resolve_output_path(output_path: str) -> Path:
     return root / timestamp / "summary.json"
 
 
+def _write_summary(
+    args: argparse.Namespace,
+    *,
+    output_path: Path,
+    results: List[Dict[str, Any]],
+    planned_sample_count: int,
+    interrupted: bool,
+) -> Dict[str, Any]:
+    summary = summarize_batch_results(
+        input_path=args.input_path,
+        target_level=args.target_level,
+        judge_model=args.judge_model,
+        judge_base_url=args.judge_base_url,
+        judge_mode=args.judge_mode,
+        results=results,
+        interrupted=interrupted,
+        planned_sample_count=planned_sample_count,
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    summary["output_path"] = str(output_path)
+    return summary
+
+
 def run(args: argparse.Namespace) -> Dict[str, Any]:
     if not args.judge_model:
         raise ValueError("Please provide --judge_model or set AUTO_EXPLORE_EVAL_MODEL")
@@ -117,41 +147,67 @@ def run(args: argparse.Namespace) -> Dict[str, Any]:
     )
 
     results: List[Dict[str, Any]] = []
-    for trace_dir in trace_dirs:
-        try:
-            sample = load_trace_sample(trace_dir, judge_mode=args.judge_mode)
-            result = judge.evaluate(sample)
-            result["status"] = "ok"
-            results.append(result)
-        except Exception as exc:
-            failure = {
-                "sample_id": Path(trace_dir).name,
-                "trace_dir": str(trace_dir),
-                "status": "error",
-                "error": str(exc),
-            }
-            results.append(failure)
-            if args.continue_on_error != "on":
-                raise
-
-    summary = summarize_batch_results(
-        input_path=args.input_path,
-        target_level=args.target_level,
-        judge_model=args.judge_model,
-        judge_base_url=args.judge_base_url,
-        judge_mode=args.judge_mode,
-        results=results,
-    )
     output_path = _resolve_output_path(args.output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
-    summary["output_path"] = str(output_path)
-    return summary
+    try:
+        for trace_dir in trace_dirs:
+            try:
+                sample = load_trace_sample(trace_dir, judge_mode=args.judge_mode)
+                result = judge.evaluate(sample)
+                result["status"] = "ok"
+                results.append(result)
+            except Exception as exc:
+                failure = {
+                    "sample_id": Path(trace_dir).name,
+                    "trace_dir": str(trace_dir),
+                    "status": "error",
+                    "error": str(exc),
+                }
+                results.append(failure)
+                if args.continue_on_error != "on":
+                    raise
+    except KeyboardInterrupt as exc:
+        summary = _write_summary(
+            args,
+            output_path=output_path,
+            results=results,
+            planned_sample_count=len(trace_dirs),
+            interrupted=True,
+        )
+        raise EvaluationInterrupted(summary) from exc
+
+    return _write_summary(
+        args,
+        output_path=output_path,
+        results=results,
+        planned_sample_count=len(trace_dirs),
+        interrupted=False,
+    )
 
 
 def main() -> None:
     args = parse_args()
-    summary = run(args)
+    try:
+        summary = run(args)
+    except EvaluationInterrupted as exc:
+        summary = exc.summary
+        print(
+            json.dumps(
+                {
+                    "sample_count": summary["sample_count"],
+                    "success_count": summary["success_count"],
+                    "error_count": summary["error_count"],
+                    "averages": summary["averages"],
+                    "interrupted": summary.get("interrupted", True),
+                    "planned_sample_count": summary.get("planned_sample_count", 0),
+                    "evaluated_sample_count": summary.get("evaluated_sample_count", 0),
+                    "remaining_sample_count": summary.get("remaining_sample_count", 0),
+                    "output_path": summary["output_path"],
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        raise SystemExit(130) from exc
     print(
         json.dumps(
             {

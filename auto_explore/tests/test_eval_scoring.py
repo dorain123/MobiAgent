@@ -11,6 +11,7 @@ from auto_explore.eval import cli as eval_cli
 from auto_explore.eval.judge import (
     JUDGE_MODE_LEGACY_TEXT,
     JUDGE_MODE_PATH_MULTIMODAL,
+    _load_judge_payload,
     build_evaluation_messages,
     summarize_batch_results,
 )
@@ -26,6 +27,7 @@ class AutoExploreEvalTests(TestCase):
         image_count: int = 0,
         include_done: bool = True,
         missing_images: set[int] | None = None,
+        missing_click_point_images: set[int] | None = None,
         metrics_root: Path | None = None,
         configured_depth_limit: int | None = None,
         configured_breadth: int | None = None,
@@ -93,10 +95,13 @@ class AutoExploreEvalTests(TestCase):
         )
 
         missing = missing_images or set()
+        missing_click_points = missing_click_point_images or set()
         for image_index in range(1, image_count + 1):
             if image_index in missing:
                 continue
             trace_dir.joinpath(f"{image_index}.jpg").write_bytes(b"fake-jpeg-bytes")
+            if image_index not in missing_click_points:
+                trace_dir.joinpath(f"{image_index}_click_point.jpg").write_bytes(b"fake-click-point-jpeg-bytes")
 
         if metrics_root is not None:
             metrics_root.mkdir(parents=True, exist_ok=True)
@@ -173,6 +178,7 @@ class AutoExploreEvalTests(TestCase):
             self.assertEqual(sample["image_count"], 3)
             self.assertEqual([Path(path).name for path in sample["image_paths"]], ["1.jpg", "2.jpg", "3.jpg"])
             self.assertEqual(len(sample["image_step_records"]), 3)
+            self.assertEqual(Path(sample["image_step_records"][0]["click_point_image_path"]).name, "1_click_point.jpg")
             self.assertEqual(len(sample["terminal_step_records"]), 1)
             self.assertEqual(sample["terminal_step_records"][0]["action_type"], "done")
             self.assertEqual(sample["configured_depth_limit"], 3)
@@ -199,12 +205,54 @@ class AutoExploreEvalTests(TestCase):
             self.assertEqual(len(messages), 2)
             self.assertEqual(messages[1]["role"], "user")
             content = messages[1]["content"]
-            self.assertEqual([item["type"] for item in content], ["text", "text", "image_url", "text", "image_url", "text"])
+            self.assertEqual(
+                [item["type"] for item in content],
+                [
+                    "text",
+                    "text",
+                    "text",
+                    "image_url",
+                    "text",
+                    "image_url",
+                    "text",
+                    "text",
+                    "image_url",
+                    "text",
+                    "image_url",
+                    "text",
+                ],
+            )
             self.assertIn("step_index", content[1]["text"])
             self.assertIn("action_type", content[1]["text"])
             self.assertIn("status", content[1]["text"])
             self.assertIn("reasoning", content[1]["text"])
-            self.assertTrue(content[2]["image_url"]["url"].startswith("data:image/jpeg;base64,"))
+            self.assertIn("Original Screenshot", content[2]["text"])
+            self.assertTrue(content[3]["image_url"]["url"].startswith("data:image/jpeg;base64,"))
+            self.assertIn("Click-Point Screenshot", content[4]["text"])
+            self.assertTrue(content[5]["image_url"]["url"].startswith("data:image/jpeg;base64,"))
+        finally:
+            remove_workspace_tempdir(tmpdir)
+
+    def test_path_multimodal_marks_missing_click_point_image(self):
+        tmpdir = make_workspace_tempdir("auto_explore_eval")
+        try:
+            run_root = tmpdir / "run_001"
+            trace_dir = self._create_trace(
+                tmpdir,
+                "run_001/data/paths/path_0001",
+                image_count=1,
+                missing_click_point_images={1},
+                metrics_root=run_root,
+                configured_depth_limit=1,
+                configured_breadth=1,
+            )
+            sample = load_trace_sample(trace_dir, judge_mode=JUDGE_MODE_PATH_MULTIMODAL)
+            messages = build_evaluation_messages(sample, judge_mode=JUDGE_MODE_PATH_MULTIMODAL)
+            content = messages[1]["content"]
+
+            self.assertFalse(sample["image_step_records"][0]["has_click_point_image"])
+            self.assertIn("click-point screenshot is missing", content[1]["text"])
+            self.assertEqual([item["type"] for item in content], ["text", "text", "text", "image_url", "text"])
         finally:
             remove_workspace_tempdir(tmpdir)
 
@@ -312,7 +360,7 @@ class AutoExploreEvalTests(TestCase):
         finally:
             remove_workspace_tempdir(tmpdir)
 
-    def test_eval_cli_path_multimodal_summary_averages_two_scores(self):
+    def test_eval_cli_path_multimodal_summary_averages_all_scores(self):
         tmpdir = make_workspace_tempdir("auto_explore_eval")
         try:
             run_root = tmpdir / "run_001"
@@ -349,11 +397,13 @@ class AutoExploreEvalTests(TestCase):
                 "task_description": "Open DemoApp and search for camera results.",
                 "trajectory_completeness_score": 8,
                 "image_coherence_score": 6,
+                "task_operation_match_score": 7,
                 "subscores": {
-                    "depth_reached": 8,
-                    "termination_quality": 7,
+                    "goal_coverage": 8,
+                    "visual_action_alignment": 7,
+                    "click_target_grounding": 6,
                     "inter_image_continuity": 6,
-                    "reasoning_context_consistency": 7,
+                    "termination_quality": 7,
                 },
                 "strengths": ["Screens are mostly sequential."],
                 "issues": ["One transition is abrupt."],
@@ -375,6 +425,12 @@ class AutoExploreEvalTests(TestCase):
             self.assertEqual(saved["judge_mode"], "path_multimodal")
             self.assertEqual(saved["averages"]["trajectory_completeness_score"], 8.0)
             self.assertEqual(saved["averages"]["image_coherence_score"], 6.0)
+            self.assertEqual(saved["averages"]["task_operation_match_score"], 7.0)
+            self.assertEqual(saved["averages"]["goal_coverage"], 8.0)
+            self.assertEqual(saved["averages"]["visual_action_alignment"], 7.0)
+            self.assertEqual(saved["averages"]["click_target_grounding"], 6.0)
+            self.assertEqual(saved["averages"]["inter_image_continuity"], 6.0)
+            self.assertEqual(saved["averages"]["termination_quality"], 7.0)
             self.assertNotIn("overall_score", saved["averages"])
             self.assertEqual(summary["output_path"], str(output_path))
         finally:
@@ -395,7 +451,7 @@ class AutoExploreEvalTests(TestCase):
         self.assertEqual(summary["success_count"], 1)
         self.assertEqual(summary["averages"]["overall_score"], 7.0)
 
-    def test_summarize_batch_results_path_multimodal_averages_only_two_scores(self):
+    def test_summarize_batch_results_path_multimodal_averages_all_scores(self):
         summary = summarize_batch_results(
             input_path="demo",
             target_level="paths",
@@ -403,15 +459,138 @@ class AutoExploreEvalTests(TestCase):
             judge_base_url="http://localhost",
             judge_mode=JUDGE_MODE_PATH_MULTIMODAL,
             results=[
-                {"status": "ok", "trajectory_completeness_score": 8, "image_coherence_score": 6},
+                {
+                    "status": "ok",
+                    "trajectory_completeness_score": 8,
+                    "image_coherence_score": 6,
+                    "task_operation_match_score": 7,
+                    "subscores": {
+                        "goal_coverage": 9,
+                        "visual_action_alignment": 6,
+                        "click_target_grounding": 8,
+                        "inter_image_continuity": 5,
+                        "termination_quality": 7,
+                    },
+                },
                 {"status": "error", "error": "bad"},
             ],
+            planned_sample_count=3,
+            interrupted=True,
         )
         self.assertEqual(summary["sample_count"], 2)
         self.assertEqual(summary["success_count"], 1)
+        self.assertTrue(summary["interrupted"])
+        self.assertEqual(summary["planned_sample_count"], 3)
+        self.assertEqual(summary["evaluated_sample_count"], 2)
+        self.assertEqual(summary["remaining_sample_count"], 1)
         self.assertEqual(summary["averages"]["trajectory_completeness_score"], 8.0)
         self.assertEqual(summary["averages"]["image_coherence_score"], 6.0)
+        self.assertEqual(summary["averages"]["task_operation_match_score"], 7.0)
+        self.assertEqual(summary["averages"]["goal_coverage"], 9.0)
+        self.assertEqual(summary["averages"]["visual_action_alignment"], 6.0)
+        self.assertEqual(summary["averages"]["click_target_grounding"], 8.0)
+        self.assertEqual(summary["averages"]["inter_image_continuity"], 5.0)
+        self.assertEqual(summary["averages"]["termination_quality"], 7.0)
         self.assertNotIn("overall_score", summary["averages"])
+
+    def test_path_multimodal_recovers_scores_from_malformed_judge_json(self):
+        payload = _load_judge_payload(
+            """
+            {
+              "trajectory_completeness_score": 8,
+              "image_coherence_score": 6,
+              "task_operation_match_score": 7,
+              "subscores": {
+                "goal_coverage": 9,
+                "visual_action_alignment": 6,
+                "click_target_grounding": 9,
+                "inter_image_continuity": 5,
+                "termination_quality": 9
+              },
+              "strengths": [bad
+            """,
+            judge_mode=JUDGE_MODE_PATH_MULTIMODAL,
+        )
+
+        self.assertEqual(payload["trajectory_completeness_score"], 8)
+        self.assertEqual(payload["image_coherence_score"], 6)
+        self.assertEqual(payload["task_operation_match_score"], 7)
+        self.assertEqual(payload["subscores"]["click_target_grounding"], 9)
+        self.assertIn("not valid JSON", payload["issues"][0])
+
+    def test_eval_cli_writes_partial_summary_on_keyboard_interrupt(self):
+        tmpdir = make_workspace_tempdir("auto_explore_eval")
+        try:
+            run_root = tmpdir / "run_001"
+            self._create_trace(
+                tmpdir,
+                "run_001/data/paths/path_0001",
+                image_count=1,
+                metrics_root=run_root,
+                configured_depth_limit=1,
+                configured_breadth=1,
+            )
+            self._create_trace(
+                tmpdir,
+                "run_001/data/paths/path_0002",
+                image_count=1,
+                metrics_root=run_root,
+                configured_depth_limit=1,
+                configured_breadth=1,
+            )
+            output_path = tmpdir / "partial_summary.json"
+            args = eval_cli.parse_args(
+                [
+                    "--input_path",
+                    str(run_root),
+                    "--target_level",
+                    "paths",
+                    "--judge_mode",
+                    "path_multimodal",
+                    "--judge_base_url",
+                    "http://localhost:8000/v1",
+                    "--judge_model",
+                    "mock-judge",
+                    "--output_path",
+                    str(output_path),
+                ]
+            )
+            fake_result = {
+                "sample_id": "path_0001",
+                "sample_kind": "path",
+                "trace_dir": str(run_root / "data" / "paths" / "path_0001"),
+                "app_name": "DemoApp",
+                "task_description": "Open DemoApp and search for camera results.",
+                "trajectory_completeness_score": 8,
+                "image_coherence_score": 7,
+                "task_operation_match_score": 6,
+                "subscores": {},
+                "strengths": [],
+                "issues": [],
+                "summary": "Partial result.",
+                "step_count": 2,
+                "image_count": 1,
+                "judge_mode": JUDGE_MODE_PATH_MULTIMODAL,
+                "evaluated_at": "2026-04-22T12:00:00",
+                "judge_model": "mock-judge",
+                "judge_base_url": "http://localhost:8000/v1",
+            }
+
+            with mock.patch("auto_explore.eval.cli.LLMTrajectoryJudge") as mocked_judge_cls:
+                mocked_judge = mocked_judge_cls.return_value
+                mocked_judge.evaluate.side_effect = [fake_result, KeyboardInterrupt()]
+                with self.assertRaises(eval_cli.EvaluationInterrupted) as raised:
+                    eval_cli.run(args)
+
+            saved = json.loads(output_path.read_text(encoding="utf-8"))
+            self.assertTrue(saved["interrupted"])
+            self.assertEqual(saved["planned_sample_count"], 2)
+            self.assertEqual(saved["evaluated_sample_count"], 1)
+            self.assertEqual(saved["remaining_sample_count"], 1)
+            self.assertEqual(saved["averages"]["task_operation_match_score"], 6.0)
+            self.assertEqual(raised.exception.summary["output_path"], str(output_path))
+        finally:
+            remove_workspace_tempdir(tmpdir)
 
     def test_parse_args_prefers_sjtu_api_key_defaults(self):
         with mock.patch.dict(
